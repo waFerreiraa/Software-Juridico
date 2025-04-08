@@ -1,0 +1,9 @@
+analyzer:
+  errors:
+    unused_local_variable: ignore
+
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # avoid_print: false
