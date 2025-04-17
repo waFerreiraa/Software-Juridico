@@ -2,7 +2,7 @@
 
 import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/models/meu_snakbar.dart';
-import 'package:jurisolutions/models/verSenha.dart';
+import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;

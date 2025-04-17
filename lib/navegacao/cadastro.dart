@@ -4,7 +4,7 @@ import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:jurisolutions/models/verSenha.dart';
+import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/login.dart';
 
 // ignore: unused_element
@@ -112,7 +112,7 @@ class _CadastroPageState extends State<CadastroPage> {
               if (value!.length < 5) return "O nome é muito curto";
               return null;
             },
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             decoration: meuInputDecoration("Nome", Icons.account_box),
           ),
           const SizedBox(height: 25),
@@ -124,7 +124,7 @@ class _CadastroPageState extends State<CadastroPage> {
               if (!value!.contains("@")) return "E-mail inválido";
               return null;
             },
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             decoration: meuInputDecoration("E-mail", Icons.email),
           ),
           const SizedBox(height: 25),
@@ -182,7 +182,7 @@ class _CadastroPageState extends State<CadastroPage> {
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 173, 98, 123),
                         strokeWidth: 2.8,
                       ),
                     )
@@ -194,6 +194,7 @@ class _CadastroPageState extends State<CadastroPage> {
                         color: Colors.white,
                       ),
                     ),
+                  
           ),
         ],
       ),
@@ -221,13 +222,20 @@ class _CadastroPageState extends State<CadastroPage> {
       if (erro != null) {
         mostrarSnackBar(context: context, texto: erro);
       } else {
-        mostrarSnackBar(context: context, texto: "Cadastro feito com sucesso!");
+        mostrarSnackBar(
+          context: context,
+          texto: "Cadastro feito com sucesso!",
+          backgroundColor: Colors.green,
+        );
         _formKey.currentState!.reset();
         _nomeController.clear();
         _emailController.clear();
         _senhaController.clear();
         _confirmarSenhaController.clear();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
       }
     } else {
       mostrarSnackBar(

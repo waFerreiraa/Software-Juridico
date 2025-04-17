@@ -28,7 +28,7 @@ class AutenticacaoServicos {
       if (e.code == "email-already-in-use") {
         return ("O usuário já está cadastrado");
       }
-      return "Erro desconhecido";
+      return "Usuario já cadastrado";
     }
   }
 

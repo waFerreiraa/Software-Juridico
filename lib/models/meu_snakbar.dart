@@ -1,14 +1,20 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-mostrarSnackBar({
+void mostrarSnackBar({
   required BuildContext context,
   required String texto,
-  bool isErro = true,
+  Color backgroundColor = Colors.red, // padrão vermelho (caso de erro)
 }) {
-  SnackBar snackBar = SnackBar(content: Text(texto),
-  backgroundColor: (isErro)? Colors.red: Colors.green,
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),);
+  final snackBar = SnackBar(
+    content: Text(
+      texto,
+      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    ),
+    backgroundColor: backgroundColor,
+    behavior: SnackBarBehavior.floating,
+    duration: const Duration(seconds: 3),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  );
 
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
 }
