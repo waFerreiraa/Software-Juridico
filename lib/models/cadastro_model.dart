@@ -1,33 +1,36 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+
 class AutenticacaoServicos {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-Future<String?> cadastroUsuario({
-  required String nome,
-  required String email,
-  required String telefone,
-  required String cpf,
-  required String senha,
-}) async {
-  try {
-    UserCredential userCredential = await _firebaseAuth
-        .createUserWithEmailAndPassword(email: email, password: senha);
-
-    await userCredential.user!.updateDisplayName(nome);
-
-    // DESLOGAR após o cadastro para evitar login automático
-    await _firebaseAuth.signOut();
-
-    return null;
-  } on FirebaseAuthException catch (e) {
-    if (e.code == "email-already-in-use") {
-      return ("O usuário já está cadastrado");
+  Future<String?> cadastroUsuario({
+    required String nome,
+    required String email,
+    required String senha,
+    required String confirmarSenha, // novo parâmetro
+  }) async {
+    if (senha != confirmarSenha) {
+      return "As senhas não coincidem";
     }
-    return "Erro desconhecido";
-  }
-}
 
+    try {
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: senha);
+
+      await userCredential.user!.updateDisplayName(nome);
+
+      // DESLOGAR após o cadastro para evitar login automático
+      await _firebaseAuth.signOut();
+
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "email-already-in-use") {
+        return ("O usuário já está cadastrado");
+      }
+      return "Erro desconhecido";
+    }
+  }
 
   Future<String?> logarUsuarios({
     required String email,
@@ -57,7 +60,7 @@ Future<String?> cadastroUsuario({
     }
   }
 
-  Future<void> deslogar()async{
+  Future<void> deslogar() async {
     return _firebaseAuth.signOut();
   }
 }

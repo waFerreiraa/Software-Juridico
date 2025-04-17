@@ -2,6 +2,7 @@
 
 import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/models/meu_snakbar.dart';
+import 'package:jurisolutions/models/verSenha.dart';
 import 'package:jurisolutions/navegacao/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -30,24 +31,25 @@ class _LoginPageState extends State<LoginPage> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: kIsWeb
-                ? Container(
-                    constraints: const BoxConstraints(maxWidth: 500),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: _buildForm(),
-                  )
-                : _buildForm(),
+            child:
+                kIsWeb
+                    ? Container(
+                      constraints: const BoxConstraints(maxWidth: 500),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: _buildForm(),
+                    )
+                    : _buildForm(),
           ),
         ),
       ),
@@ -90,9 +92,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SizedBox(height: 25),
 
-          TextFormField(
+          CampoSenha(
             controller: _senhaController,
-            obscureText: true,
+            hintText: "Senha",
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return "A senha não pode ser vazia.";
@@ -102,9 +104,9 @@ class _LoginPageState extends State<LoginPage> {
               }
               return null;
             },
-            style: TextStyle(fontSize: inputFontSize),
             decoration: _inputDecoration(label: 'Senha', icon: Icons.lock),
           ),
+
           const SizedBox(height: 45),
 
           ElevatedButton(
@@ -144,9 +146,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  InputDecoration _inputDecoration({required String label, required IconData icon}) {
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+  }) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 13.0,
+        horizontal: 10.0,
+      ),
       prefixIcon: Icon(icon),
       filled: true,
       fillColor: const Color(0xffE0D3CA),
@@ -158,7 +166,10 @@ class _LoginPageState extends State<LoginPage> {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color.fromARGB(255, 181, 164, 150), width: 2),
+        borderSide: const BorderSide(
+          color: Color.fromARGB(255, 181, 164, 150),
+          width: 2,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),

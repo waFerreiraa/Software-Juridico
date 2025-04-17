@@ -4,6 +4,15 @@ import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:jurisolutions/models/verSenha.dart';
+import 'package:jurisolutions/navegacao/login.dart';
+
+// ignore: unused_element
+bool _senhaVisivel = false;
+// ignore: unused_element
+bool _confirmarSenhaVisivel = false;
+
+bool _carregando = false;
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -17,15 +26,17 @@ class _CadastroPageState extends State<CadastroPage> {
 
   final _nomeController = TextEditingController();
   final _emailController = TextEditingController();
-  final _telefoneController = TextEditingController();
-  final _cpfController = TextEditingController();
   final _senhaController = TextEditingController();
+  final _confirmarSenhaController = TextEditingController();
 
   final _auten = AutenticacaoServicos();
 
   InputDecoration meuInputDecoration(String label, IconData icon) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 13.0,
+        horizontal: 10.0,
+      ),
       prefixIcon: Icon(icon),
       filled: true,
       fillColor: const Color(0xffE0D3CA),
@@ -38,7 +49,10 @@ class _CadastroPageState extends State<CadastroPage> {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color.fromARGB(255, 181, 164, 150), width: 2),
+        borderSide: const BorderSide(
+          color: Color.fromARGB(255, 181, 164, 150),
+          width: 2,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -55,24 +69,25 @@ class _CadastroPageState extends State<CadastroPage> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: kIsWeb
-                ? Container(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: _buildForm(),
-                  )
-                : _buildForm(),
+            child:
+                kIsWeb
+                    ? Container(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: _buildForm(),
+                    )
+                    : _buildForm(),
           ),
         ),
       ),
@@ -113,45 +128,45 @@ class _CadastroPageState extends State<CadastroPage> {
             decoration: meuInputDecoration("E-mail", Icons.email),
           ),
           const SizedBox(height: 25),
-
-          TextFormField(
-            controller: _telefoneController,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "O telefone não pode ser vazio.";
-              return null;
-            },
-            style: const TextStyle(fontSize: 18),
-            decoration: meuInputDecoration("Telefone", Icons.call),
-          ),
-          const SizedBox(height: 25),
-
-          TextFormField(
-            controller: _cpfController,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "O CPF/CNPJ não pode ser vazio.";
-              if (value!.length < 11) return "Digite um CPF/CNPJ válido";
-              return null;
-            },
-            style: const TextStyle(fontSize: 18),
-            decoration: meuInputDecoration("CPF/CNPJ", Icons.feed),
-          ),
-          const SizedBox(height: 25),
-
-          TextFormField(
+          CampoSenha(
             controller: _senhaController,
-            obscureText: true,
+            hintText: "Senha",
             validator: (value) {
-              if (value?.isEmpty ?? true) return "A senha não pode ser vazia.";
-              if (value!.length < 6) return "A senha deve ter pelo menos 6 caracteres";
+              if (value == null || value.isEmpty) {
+                return "A senha não pode ser vazia.";
+              }
+              if (value.length < 6) {
+                return "A senha deve ter pelo menos 6 caracteres";
+              }
               return null;
             },
-            style: const TextStyle(fontSize: 18),
             decoration: meuInputDecoration("Senha", Icons.lock),
           ),
+
+          const SizedBox(height: 25),
+
+          CampoSenha(
+            controller: _confirmarSenhaController,
+            hintText: "Confirme sua senha",
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "A senha não pode ser vazia.";
+              }
+              if (value.length < 6) {
+                return "A senha deve ter pelo menos 6 caracteres";
+              }
+              if (value != _senhaController.text) {
+                return "As senhas não coincidem";
+              }
+              return null;
+            },
+            decoration: meuInputDecoration("Confirme sua senha", Icons.lock),
+          ),
+
           const SizedBox(height: 30),
 
           ElevatedButton(
-            onPressed: botaoPrincipalClicado,
+            onPressed: _carregando ? null : botaoPrincipalClicado,
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(300, 55),
               elevation: 4,
@@ -161,45 +176,64 @@ class _CadastroPageState extends State<CadastroPage> {
                 borderRadius: BorderRadius.circular(9),
               ),
             ),
-            child: const Text(
-              "Me cadastrar",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
+            child:
+                _carregando
+                    ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.8,
+                      ),
+                    )
+                    : const Text(
+                      "Me cadastrar",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
           ),
         ],
       ),
     );
   }
 
-  void botaoPrincipalClicado() {
+  void botaoPrincipalClicado() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _carregando = true);
+
       final nome = _nomeController.text.trim();
       final email = _emailController.text.trim();
-      final telefone = _telefoneController.text.trim();
-      final cpf = _cpfController.text.trim();
       final senha = _senhaController.text.trim();
+      final confirmar = _confirmarSenhaController.text.trim();
 
-      _auten.cadastroUsuario(
+      final erro = await _auten.cadastroUsuario(
         nome: nome,
         email: email,
-        telefone: telefone,
-        cpf: cpf,
         senha: senha,
-      ).then((String? erro) {
-        if (erro != null) {
-          mostrarSnackBar(context: context, texto: erro);
-        } else {
-          mostrarSnackBar(context: context, texto: "Cadastro feito com sucesso!");
-          _formKey.currentState!.reset();
-          _nomeController.clear();
-          _emailController.clear();
-          _telefoneController.clear();
-          _cpfController.clear();
-          _senhaController.clear();
-        }
-      });
+        confirmarSenha: confirmar,
+      );
+
+      setState(() => _carregando = false);
+
+      if (erro != null) {
+        mostrarSnackBar(context: context, texto: erro);
+      } else {
+        mostrarSnackBar(context: context, texto: "Cadastro feito com sucesso!");
+        _formKey.currentState!.reset();
+        _nomeController.clear();
+        _emailController.clear();
+        _senhaController.clear();
+        _confirmarSenhaController.clear();
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      }
     } else {
-      mostrarSnackBar(context: context, texto: "Por favor, preencha todos os campos corretamente.");
+      mostrarSnackBar(
+        context: context,
+        texto: "Por favor, preencha todos os campos corretamente.",
+      );
     }
   }
 }
