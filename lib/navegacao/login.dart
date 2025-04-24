@@ -145,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: inputFontSize,
                 fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 69, 68, 68),
               ),
             ),
           ),

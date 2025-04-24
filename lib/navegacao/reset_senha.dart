@@ -54,23 +54,34 @@ class ResetPass extends StatelessWidget {
                   decoration: meuInputDecoration("E-mail", Icons.email),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(10, 40),
-                    elevation: 4,
-                    shadowColor: Colors.cyan,
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
+                SizedBox(
+                  width: 220,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(10, 40),
+                      elevation: 4,
+                      shadowColor: const Color.fromARGB(255, 79, 30, 46),
+                      backgroundColor: const Color(0xff5E293B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                    ),
+                    child: Text(
+                      "Enviar",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  child: Text("Enviar"),
                 ),
               ],
             ),
