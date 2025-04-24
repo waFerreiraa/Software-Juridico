@@ -6,6 +6,7 @@ import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:jurisolutions/navegacao/reset_senha.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -132,11 +133,19 @@ class _LoginPageState extends State<LoginPage> {
 
           const SizedBox(height: 25),
 
-          Text(
-            "Esqueci minha senha",
-            style: TextStyle(
-              fontSize: inputFontSize,
-              fontWeight: FontWeight.bold,
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ResetPass()),
+              );
+            },
+            child: Text(
+              "Esqueci minha senha",
+              style: TextStyle(
+                fontSize: inputFontSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
 
