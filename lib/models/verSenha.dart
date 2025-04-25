@@ -34,11 +34,10 @@ class _CampoSenhaState extends State<CampoSenha> {
       controller: widget.controller,
       obscureText: _obscureText,
       validator: widget.validator,
+      style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
       decoration: widget.decoration?.copyWith(
         suffixIcon: IconButton(
-          icon: Icon(
-            _obscureText ? Icons.visibility_off : Icons.visibility,
-          ),
+          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
           onPressed: _alternarVisibilidade,
         ),
       ),

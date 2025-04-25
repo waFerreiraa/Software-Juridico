@@ -45,7 +45,9 @@ flutter:
   uses-material-design: true
 
   assets:
-  - assets/LogoTelaLogin.png
-  - assets/login_ilustracao.png
-  - assets/Logoxs.png
+    - assets/LogoTelaLogin.png
+    - assets/login_ilustracao.png
+    - assets/Logoxs.png
+    - assets/Advogado_.png  # <-- adicione sua nova imagem aqui
+  
 

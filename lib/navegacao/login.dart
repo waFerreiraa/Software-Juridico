@@ -88,7 +88,10 @@ class _LoginPageState extends State<LoginPage> {
               }
               return null;
             },
-            style: TextStyle(fontSize: inputFontSize),
+            style: TextStyle(
+              fontSize: inputFontSize,
+              fontWeight: FontWeight.w600,
+            ),
             decoration: _inputDecoration(label: 'E-mail', icon: Icons.email),
           ),
           const SizedBox(height: 25),
