@@ -20,7 +20,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+    
   flutter_launcher_icons: ^0.14.3
   flutter_lints: ^5.0.0
 
@@ -31,11 +31,11 @@ flutter_native_splash:
   ios: true
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  color: "#5E293B"
-  image_path: "assets/icon/icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  adaptive_icon_background: "assets/icon/background.png" # Fundo sólido vermelho
+  adaptive_icon_foreground: "assets/icon/foreground.png" # Logo e texto com fundo tranparente
+  image_path: "assets/icon/icon.png" # Este é só para fallback em iOS/Android antigos
   
   flutter_lints: ^5.0.0
 
@@ -49,5 +49,6 @@ flutter:
     - assets/login_ilustracao.png
     - assets/Logoxs.png
     - assets/Advogado_.png  # <-- adicione sua nova imagem aqui
+    - assets/icon/
   
 
