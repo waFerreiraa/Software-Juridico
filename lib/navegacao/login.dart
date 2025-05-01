@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:jurisolutions/navegacao/reset_senha.dart';
 
+bool _carregando = false;
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -114,24 +116,34 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 45),
 
           ElevatedButton(
-            onPressed: botaoPrincipalClicado,
+            onPressed: _carregando ? null : botaoPrincipalClicado,
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(buttonWidth, buttonHeight),
+              minimumSize: const Size(300, 55),
               elevation: 4,
-              shadowColor: const Color.fromARGB(255, 79, 30, 46),
+              shadowColor: const Color.fromARGB(255, 64, 27, 39),
               backgroundColor: const Color(0xff5E293B),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: BorderRadius.circular(9),
               ),
             ),
-            child: Text(
-              "Login",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: buttonFontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child:
+                _carregando
+                    ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Color.fromARGB(255, 173, 98, 123),
+                        strokeWidth: 2.8,
+                      ),
+                    )
+                    : const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
           ),
 
           const SizedBox(height: 25),

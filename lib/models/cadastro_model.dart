@@ -1,5 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// ignore: unused_import
+import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AutenticacaoServicos {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -57,6 +59,14 @@ class AutenticacaoServicos {
       }
     } catch (e) {
       return 'Erro inesperado: $e';
+    }
+  }
+
+  Future<String?> resetarSenhaUsu({required String email}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print('error: $e');
     }
   }
 

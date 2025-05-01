@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:jurisolutions/models/cadastro_model.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/navegacao/login.dart';
 
-class ResetPass extends StatelessWidget {
+bool _carregando = false;
+
+class ResetPass extends StatefulWidget {
+  const ResetPass({super.key});
+
+  @override
+  State<ResetPass> createState() => _ResetPassState();
+}
+
+class _ResetPassState extends State<ResetPass> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _emailController = TextEditingController();
+
+  final _auten = AutenticacaoServicos();
+
   InputDecoration meuInputDecoration(String label, IconData icon) {
     return InputDecoration(
       contentPadding: const EdgeInsets.symmetric(
@@ -32,8 +49,6 @@ class ResetPass extends StatelessWidget {
     );
   }
 
-  const ResetPass({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +57,7 @@ class ResetPass extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Form(
+            key: _formKey,
             child: Column(
               children: [
                 Text(
@@ -50,6 +66,14 @@ class ResetPass extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 TextFormField(
+                  controller: _emailController,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return "O e-mail não pode ser vazio.";
+                    }
+                    if (!value!.contains("@")) return "E-mail inválido";
+                    return null;
+                  },
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   decoration: meuInputDecoration("E-mail", Icons.email),
                 ),
@@ -58,12 +82,7 @@ class ResetPass extends StatelessWidget {
                   width: 220,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
-                    },
+                    onPressed: _carregando ? null : botaoPrincipalClicado,
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(10, 40),
                       elevation: 4,
@@ -89,5 +108,39 @@ class ResetPass extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void botaoPrincipalClicado() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _carregando = true);
+
+      final email = _emailController.text.trim();
+
+      final erro = await _auten.resetarSenhaUsu(email: email);
+
+      setState(() => _carregando = false);
+
+      if (erro != null) {
+        mostrarSnackBar(context: context, texto: erro);
+      } else {
+        mostrarSnackBar(
+          context: context,
+          texto: "Um link para a redefinição de senha foi enviado para seu E-mail!",
+          backgroundColor: Colors.green,
+        );
+        _formKey.currentState!.reset();
+        _emailController.clear();
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      }
+    } else {
+      mostrarSnackBar(
+        context: context,
+        texto: "Por favor, preencha todos os campos corretamente.",
+      );
+    }
   }
 }

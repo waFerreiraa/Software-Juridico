@@ -1,6 +1,6 @@
 name: jurisolutions
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none' # Remove this line se for publicar no pub.dev
 
 version: 1.0.0+1
 
@@ -14,41 +14,33 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.2
-  flutter_native_splash: ^2.4.5
-
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-    
   flutter_launcher_icons: ^0.14.3
   flutter_lints: ^5.0.0
 
-flutter_native_splash:
-  color: "#5E293B"
-  image: "assets/app/splash.png"
-  android: true
-  ios: true
-
-flutter_launcher_icons:
-  android: true
-  ios: true
-  adaptive_icon_background: "assets/icon/background.png" # Fundo sólido vermelho
-  adaptive_icon_foreground: "assets/icon/foreground.png" # Logo e texto com fundo tranparente
-  image_path: "assets/icon/icon.png" # Este é só para fallback em iOS/Android antigos
-  
-  flutter_lints: ^5.0.0
-
-
 flutter:
-
   uses-material-design: true
 
   assets:
     - assets/LogoTelaLogin.png
     - assets/login_ilustracao.png
     - assets/Logoxs.png
-    - assets/Advogado_.png  # <-- adicione sua nova imagem aqui
+    - assets/Advogado_.png
     - assets/icon/
-  
 
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/icon/splash.png"
+  android: true
+  ios: true
+  fullscreen: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "assets/icon/background.png"
+  adaptive_icon_foreground: "assets/icon/foreground.png"
+  image_path: "assets/icon/icon.png"
