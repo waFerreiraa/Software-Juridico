@@ -26,6 +26,7 @@ flutter:
 
   assets:
     - assets/   # Isso inclui tudo dentro da pasta 'assets' e subpastas
+    - assets/icon/  # Isso inclui tudo dentro da pasta 'assets' e subpastas
 
 flutter_native_splash:
   color: "#ffffff"
