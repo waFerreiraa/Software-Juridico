@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:jurisolutions/navegacao/agenda_page.dart';
 import 'package:jurisolutions/navegacao/inicio.dart';
 import 'package:jurisolutions/navegacao/notificacao_page.dart';
+import 'package:jurisolutions/navegacao/perfil.dart';
 import 'package:jurisolutions/navegacao/processos_page.dart';
 import 'package:jurisolutions/models/cadastro_model.dart';
+import 'package:jurisolutions/navegacao/reset_senha.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -103,15 +105,47 @@ class _HomePageState extends State<HomePage> {
                     color: Theme.of(context).iconTheme.color,
                   ),
                   title: Text(
-                    "Conta",
+                    "Perfil",
                     style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () {
-                    Navigator.of(context).pop();
-                    AutenticacaoServicos().deslogar();
+                      Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => PerfilPage()),);
                   },
                 ),
                 ListTile(
+                  leading: Icon(
+                    Icons.lock,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  title: Text(
+                    "Resetar Senha",
+                    style: TextStyle(fontSize: width * 0.045),
+                  ),
+                  onTap: () {
+                      Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => ResetPass()),);
+                  },
+                ),
+                SwitchListTile(
+                  secondary: Icon(
+                    isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  title: Text(
+                    "Modo Noturno",
+                    style: TextStyle(fontSize: width * 0.045),
+                  ),
+                  value: isDarkMode,
+                  onChanged: (value) {
+                    setState(() {
+                      isDarkMode = value;
+                    });
+                  },
+                ),
+                          ListTile(
                   leading: Icon(
                     Icons.logout,
                     color: Theme.of(context).iconTheme.color,
@@ -129,22 +163,6 @@ class _HomePageState extends State<HomePage> {
                       ), // sua tela inicial
                       (route) => false,
                     );
-                  },
-                ),
-                SwitchListTile(
-                  secondary: Icon(
-                    isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  title: Text(
-                    "Modo Noturno",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
-                  value: isDarkMode,
-                  onChanged: (value) {
-                    setState(() {
-                      isDarkMode = value;
-                    });
                   },
                 ),
               ],

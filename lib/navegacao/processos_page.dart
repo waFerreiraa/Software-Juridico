@@ -13,13 +13,11 @@ class _ProcessosPageState extends State<ProcessosPage> {
   @override
   void initState() {
     super.initState();
-    // Ajusta a cor da barra de status conforme o modo do sistema
-    final brightness = WidgetsBinding.instance.window.platformBrightness;
+    // Define cor fixa da barra de status para modo claro
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
+      const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: Brightness.dark,
       ),
     );
   }
@@ -33,6 +31,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         title: Text(
@@ -53,19 +52,13 @@ class _ProcessosPageState extends State<ProcessosPage> {
             },
           ),
         ],
-        iconTheme: IconThemeData(
-          color: theme.iconTheme.color,
-        ),
-        flexibleSpace: Container(
-          color: theme.scaffoldBackgroundColor,
-        ),
+        iconTheme: IconThemeData(color: theme.iconTheme.color),
+        flexibleSpace: Container(color: theme.scaffoldBackgroundColor),
       ),
       body: Builder(
         builder: (context) {
-          // Verifica se o conteúdo ultrapassa a altura da tela
           bool isScrollable = screenHeight * 0.8 < screenHeight;
-          
-          // Se o conteúdo for maior que a tela, usa o SingleChildScrollView
+
           if (isScrollable) {
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 15),
@@ -79,7 +72,12 @@ class _ProcessosPageState extends State<ProcessosPage> {
     );
   }
 
-  Widget _buildContent(BuildContext context, double screenWidth, ThemeData theme, double screenHeight) {
+  Widget _buildContent(
+    BuildContext context,
+    double screenWidth,
+    ThemeData theme,
+    double screenHeight,
+  ) {
     return Column(
       children: [
         Center(
@@ -90,7 +88,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
           ),
         ),
         Container(
-          margin: EdgeInsets.all(screenWidth * 0.04),  // Diminui o espaço entre o texto e as bordas
+          margin: EdgeInsets.all(screenWidth * 0.04),
           child: Column(
             children: [
               Text(
@@ -100,7 +98,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: screenHeight * 0.015), // Menor espaçamento entre os widgets
+              SizedBox(height: screenHeight * 0.015),
               Text(
                 "Tenha todos os casos do seu escritório em um só lugar!",
                 textAlign: TextAlign.center,
@@ -136,14 +134,14 @@ class _ProcessosPageState extends State<ProcessosPage> {
     required String description,
   }) {
     final theme = Theme.of(context);
-    final cardColor = theme.brightness == Brightness.dark
-        ? Colors.grey[800]
-        : const Color(0xffE0D3CA);
+    final cardColor = const Color(0xffE0D3CA); // cor fixa para modo claro
 
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
-      margin: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * 0.03), // Menor espaçamento
-      padding: const EdgeInsets.all(10), // Menor padding dentro do card
+      margin: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.width * 0.03,
+      ),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(15),
@@ -158,7 +156,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.008),  // Menor espaçamento
+          SizedBox(height: MediaQuery.of(context).size.height * 0.008),
           Text(
             description,
             style: theme.textTheme.bodySmall?.copyWith(

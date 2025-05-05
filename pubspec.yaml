@@ -1,6 +1,6 @@
 name: jurisolutions
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line se for publicar no pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -25,11 +25,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/LogoTelaLogin.png
-    - assets/login_ilustracao.png
-    - assets/Logoxs.png
-    - assets/Advogado_.png
-    - assets/icon/
+    - assets/   # Isso inclui tudo dentro da pasta 'assets' e subpastas
 
 flutter_native_splash:
   color: "#ffffff"
