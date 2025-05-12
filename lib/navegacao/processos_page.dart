@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jurisolutions/navegacao/cad_processo.dart';
+import 'package:jurisolutions/navegacao/casosAtivos.dart';
 
 class ProcessosPage extends StatefulWidget {
   const ProcessosPage({super.key});
@@ -41,6 +42,16 @@ class _ProcessosPageState extends State<ProcessosPage> {
           ),
         ),
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.filter_list_outlined, size: 31),
+            tooltip: 'Ativos',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CasosAtivos()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add, size: 30),
             tooltip: 'Adicionar Processo',

@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'package:jurisolutions/navegacao/home.dart';
 import 'package:jurisolutions/navegacao/inicio.dart';
-import 'package:jurisolutions/navegacao/processos_page.dart';
 import 'package:jurisolutions/splash/splash.dart';
 
 void main() async {
