@@ -1,7 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:intl/intl.dart';
 
 enum CadProcesso { geral, partes }
 
@@ -15,7 +20,6 @@ class CadPro extends StatefulWidget {
 class _CadProState extends State<CadPro> {
   CadProcesso cadproView = CadProcesso.geral;
 
-  // Controllers para informações gerais
   final numeroCtrl = TextEditingController();
   final dataCtrl = TextEditingController();
   final valorCtrl = TextEditingController();
@@ -26,12 +30,31 @@ class _CadProState extends State<CadPro> {
   final faseCtrl = TextEditingController();
   final assuntoCtrl = TextEditingController();
 
-  // Controllers para partes envolvidas (única parte por enquanto)
   final nomeParteCtrl = TextEditingController();
   final cpfCnpjCtrl = TextEditingController();
   final enderecoCtrl = TextEditingController();
   final advogadoCtrl = TextEditingController();
   final oabCtrl = TextEditingController();
+
+  final numeroProcessoFormatter = MaskTextInputFormatter(
+    mask: '######-##.####.#.##.####',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
+  final dataFormatter = MaskTextInputFormatter(
+    mask: '##/##/####',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
+  final cpfCnpjFormatter = MaskTextInputFormatter(
+  mask: '###.###.###-##', // Formato para CPF
+  filter: {"#": RegExp(r'[0-9]')},
+);
+
+  final valorFormatter = CurrencyInputFormatter(
+    leadingSymbol: 'R\$',
+    useSymbolPadding: true,
+  );
 
   @override
   void initState() {
@@ -46,10 +69,7 @@ class _CadProState extends State<CadPro> {
 
   InputDecoration meuInputDecoration(String label) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 13.0,
-        horizontal: 10.0,
-      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
       filled: true,
       fillColor: const Color(0xffE0D3CA),
       labelText: label,
@@ -73,7 +93,21 @@ class _CadProState extends State<CadPro> {
     );
   }
 
-  // Função para salvar no Firestore
+  Future<void> _selecionarData(BuildContext context) async {
+    DateTime? dataSelecionada = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    );
+
+    if (dataSelecionada != null) {
+      setState(() {
+        dataCtrl.text = DateFormat('dd/MM/yyyy').format(dataSelecionada);
+      });
+    }
+  }
+
   Future<void> salvarNoFirestore() async {
     final partes = [
       {
@@ -88,7 +122,7 @@ class _CadProState extends State<CadPro> {
     final dados = {
       'numero': numeroCtrl.text,
       'data': dataCtrl.text,
-      'valor': double.tryParse(valorCtrl.text) ?? 0.0,
+      'valor': double.tryParse(valorCtrl.text.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.')) ?? 0.0,
       'vara': varaCtrl.text,
       'tribunal': tribunalCtrl.text,
       'juizado': juizadoCtrl.text,
@@ -96,8 +130,9 @@ class _CadProState extends State<CadPro> {
       'fase_processual': faseCtrl.text,
       'assunto': assuntoCtrl.text,
       'partes': partes,
-      'status': 'ativo',  // Status 'ativo' para todos os processos
+      'status': 'ativo',
     };
+
     numeroCtrl.clear();
     dataCtrl.clear();
     valorCtrl.clear();
@@ -113,38 +148,34 @@ class _CadProState extends State<CadPro> {
     advogadoCtrl.clear();
     oabCtrl.clear();
 
-    // Chamada da função de salvar no Firestore
     await salvarInfo(dados);
 
-    // Feedback ao usuário
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Processo salvo com sucesso!')),
     );
   }
 
-  // Função para salvar no Firestore
   Future<void> salvarInfo(Map<String, dynamic> dadosProcesso) async {
     try {
-      dadosProcesso['usuarioId'] = FirebaseAuth.instance.currentUser!.uid;  // Inclui o usuário logado
+      dadosProcesso['usuarioId'] = FirebaseAuth.instance.currentUser!.uid;
       await FirebaseFirestore.instance.collection('processos').add(dadosProcesso);
-      print('Processo salvo com sucesso!');
     } catch (e) {
       print('Erro ao salvar processo: $e');
     }
   }
 
-  Widget _buildForm(
-    List<String> campos,
-    List<TextEditingController> controllers,
-    double largura,
-  ) {
+  Widget _buildForm(List<String> campos, List<TextEditingController> controllers, double largura, {List<TextInputFormatter>? formatadores, List<TextInputType>? teclados}) {
     return Column(
       children: [
         for (int i = 0; i < campos.length; i++) ...[
           TextFormField(
             controller: controllers[i],
+            inputFormatters: formatadores != null ? [formatadores[i]] : null,
+            keyboardType: teclados != null ? teclados[i] : TextInputType.text,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             decoration: meuInputDecoration(campos[i]),
+            readOnly: campos[i] == "Data*",
+            onTap: campos[i] == "Data*" ? () => _selecionarData(context) : null,
           ),
           const SizedBox(height: 30),
         ],
@@ -154,7 +185,7 @@ class _CadProState extends State<CadPro> {
             width: largura,
             height: 55,
             child: ElevatedButton(
-              onPressed: salvarNoFirestore,  // Chamada da função ao pressionar "Salvar"
+              onPressed: salvarNoFirestore,
               style: ElevatedButton.styleFrom(
                 elevation: 4,
                 shadowColor: const Color.fromARGB(255, 64, 27, 39),
@@ -203,6 +234,28 @@ class _CadProState extends State<CadPro> {
         assuntoCtrl,
       ],
       largura,
+      formatadores: [
+        numeroProcessoFormatter, // Usando o formatter de número do processo
+        dataFormatter, // Usando o formatter de data
+        valorFormatter, // Usando o formatter de valor
+        FilteringTextInputFormatter.singleLineFormatter, // Para campos de texto
+        FilteringTextInputFormatter.singleLineFormatter, // Para campos de texto
+        FilteringTextInputFormatter.singleLineFormatter, // Para campos de texto
+        FilteringTextInputFormatter.singleLineFormatter, // Para campos de texto
+        FilteringTextInputFormatter.singleLineFormatter, // Para campos de texto
+        FilteringTextInputFormatter.singleLineFormatter, // Para campos de texto
+      ],
+      teclados: [
+        TextInputType.number,
+        TextInputType.datetime,
+        TextInputType.number,
+        TextInputType.text,
+        TextInputType.text,
+        TextInputType.text,
+        TextInputType.text,
+        TextInputType.text,
+        TextInputType.text,
+      ],
     );
   }
 
@@ -211,14 +264,27 @@ class _CadProState extends State<CadPro> {
       ["Nome*", "CPF/CNPJ*", "Endereço*", "Advogado*", "OAB*"],
       [nomeParteCtrl, cpfCnpjCtrl, enderecoCtrl, advogadoCtrl, oabCtrl],
       largura,
+      formatadores: [
+        FilteringTextInputFormatter.singleLineFormatter, // Usando o formatter de linha única
+        cpfCnpjFormatter, // Usando o formatter de CPF/CNPJ
+        FilteringTextInputFormatter.singleLineFormatter, // Usando o formatter de linha única
+        FilteringTextInputFormatter.singleLineFormatter, // Usando o formatter de linha única
+        FilteringTextInputFormatter.singleLineFormatter, // Usando o formatter de linha única
+      ],
+      teclados: [
+        TextInputType.text,
+        TextInputType.number,
+        TextInputType.text,
+        TextInputType.text,
+        TextInputType.text,
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final double larguraTela = MediaQuery.of(context).size.width;
-    final double larguraMax =
-        larguraTela * 0.9 > 500 ? 500.0 : larguraTela * 0.9;
+    final double larguraMax = larguraTela * 0.9 > 500 ? 500.0 : larguraTela * 0.9;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -227,52 +293,31 @@ class _CadProState extends State<CadPro> {
         elevation: 0,
         title: const Text(
           "Cadastro de Processo",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 25,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.black),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(95),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12.0,
-              vertical: 10.0,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
             child: Center(
               child: IntrinsicWidth(
-                child: SegmentedButton<CadProcesso>(  // Alternar entre as views
+                child: SegmentedButton<CadProcesso>(
                   style: SegmentedButton.styleFrom(
                     backgroundColor: const Color(0xffE0D3CA),
                     foregroundColor: Colors.black,
                     selectedForegroundColor: Colors.white,
                     selectedBackgroundColor: const Color(0xff5E293B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                   ),
                   segments: const [
                     ButtonSegment<CadProcesso>(
                       value: CadProcesso.geral,
-                      label: Text(
-                        'Informações Gerais',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
+                      label: Text("Informações Gerais", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ),
                     ButtonSegment<CadProcesso>(
                       value: CadProcesso.partes,
-                      label: Text(
-                        'Partes Envolvidas',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
+                      label: Text("Partes Envolvidas", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ),
                   ],
                   selected: <CadProcesso>{cadproView},
@@ -295,10 +340,8 @@ class _CadProState extends State<CadPro> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    if (cadproView == CadProcesso.geral)
-                      _buildInformacoesGerais(larguraMax),
-                    if (cadproView == CadProcesso.partes)
-                      _buildPartesEnvolvidas(larguraMax),
+                    if (cadproView == CadProcesso.geral) _buildInformacoesGerais(larguraMax),
+                    if (cadproView == CadProcesso.partes) _buildPartesEnvolvidas(larguraMax),
                   ],
                 ),
               ),
