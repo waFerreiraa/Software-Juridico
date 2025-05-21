@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 DrawerHeader(
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[800] : Colors.blue,
+                    color: isDarkMode ? Colors.grey[800] : Color(0xff5E293B),
                   ),
                   child: Text(
                     'Menu',

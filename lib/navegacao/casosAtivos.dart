@@ -19,8 +19,12 @@ class _CasosAtivosState extends State<CasosAtivos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Casos Ativos'),
+        title: const Text(
+    'Casos Ativos',
+    style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xff5E293B),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<QuerySnapshot>(
         // Filtra os processos pelo usuarioId
