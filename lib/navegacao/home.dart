@@ -2,12 +2,12 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/navegacao/agenda_page.dart';
 import 'package:jurisolutions/navegacao/inicio.dart';
 import 'package:jurisolutions/navegacao/notificacao_page.dart';
 import 'package:jurisolutions/navegacao/perfil.dart';
 import 'package:jurisolutions/navegacao/processos_page.dart';
-import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/navegacao/reset_senha.dart';
 
 class HomePage extends StatefulWidget {
@@ -58,24 +58,23 @@ class _HomePageState extends State<HomePage> {
     final width = size.width;
     final height = size.height;
 
-    final ThemeData theme =
-        isDarkMode
-            ? ThemeData.dark().copyWith(
-              iconTheme: const IconThemeData(color: Color(0xFFE0D3CA)),
-              bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                selectedItemColor: const Color(0xFFE0D3CA),
-                unselectedItemColor: const Color(0xFFE0D3CA).withOpacity(0.5),
-                backgroundColor: Colors.black,
-              ),
-            )
-            : ThemeData.light().copyWith(
-              iconTheme: const IconThemeData(color: Colors.black),
-              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                selectedItemColor: Color(0xff5E293B),
-                unselectedItemColor: Colors.black,
-                backgroundColor: Colors.white,
-              ),
-            );
+    final ThemeData theme = isDarkMode
+        ? ThemeData.dark().copyWith(
+            iconTheme: const IconThemeData(color: Color(0xFFE0D3CA)),
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              selectedItemColor: const Color(0xFFE0D3CA),
+              unselectedItemColor: const Color(0xFFE0D3CA).withOpacity(0.5),
+              backgroundColor: Colors.black,
+            ),
+          )
+        : ThemeData.light().copyWith(
+            iconTheme: const IconThemeData(color: Colors.black),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              selectedItemColor: Color(0xff5E293B),
+              unselectedItemColor: Colors.black,
+              backgroundColor: Colors.white,
+            ),
+          );
 
     return Theme(
       data: theme,
@@ -89,7 +88,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 DrawerHeader(
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[800] : Color(0xff5E293B),
+                    color: isDarkMode ? Colors.grey[800] : const Color(0xff5E293B),
                   ),
                   child: Text(
                     'Menu',
@@ -109,9 +108,9 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () {
-                      Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => PerfilPage()),);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => PerfilPage()),
+                    );
                   },
                 ),
                 ListTile(
@@ -124,9 +123,9 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () {
-                      Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => ResetPass()),);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ResetPass()),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -145,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                 ),
-                          ListTile(
+                ListTile(
                   leading: Icon(
                     Icons.logout,
                     color: Theme.of(context).iconTheme.color,
@@ -160,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                         builder: (context) => InicioTela(),
-                      ), // sua tela inicial
+                      ),
                       (route) => false,
                     );
                   },
@@ -169,69 +168,125 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           body: SafeArea(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  myCurrentIndex = index;
-                });
-              },
-              children: pages,
-            ),
-          ),
-          bottomNavigationBar: Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: width * 0.02,
-              vertical: height * 0.01,
-            ),
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 30,
-                  offset: Offset(2, height * 0.02),
+            child: Row(
+              children: [
+                if (width >= 800)
+                  NavigationRail(
+                    selectedIndex: myCurrentIndex,
+                    onDestinationSelected: (index) {
+                      if (index == 3) {
+                        _scaffoldKey.currentState?.openEndDrawer();
+                      } else {
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                        setState(() {
+                          myCurrentIndex = index;
+                        });
+                      }
+                    },
+                    labelType: NavigationRailLabelType.selected,
+                    backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+                    selectedIconTheme: IconThemeData(
+                      color: theme.bottomNavigationBarTheme.selectedItemColor,
+                    ),
+                    unselectedIconTheme: IconThemeData(
+                      color: theme.bottomNavigationBarTheme.unselectedItemColor,
+                    ),
+                    selectedLabelTextStyle: TextStyle(
+                      color: theme.bottomNavigationBarTheme.selectedItemColor,
+                      fontSize: width * 0.015,
+                    ),
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(Icons.folder_open),
+                        label: Text('Processos'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.calendar_month_outlined),
+                        label: Text('Agenda'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.notifications_active_outlined),
+                        label: Text('Notificação'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.menu),
+                        label: Text('Menu'),
+                      ),
+                    ],
+                  ),
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        myCurrentIndex = index;
+                      });
+                    },
+                    children: pages,
+                  ),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BottomNavigationBar(
-                currentIndex: myCurrentIndex,
-                selectedFontSize: width * 0.04,
-                showSelectedLabels: true,
-                showUnselectedLabels: false,
-                onTap: (index) {
-                  if (index == 3) {
-                    _scaffoldKey.currentState?.openEndDrawer();
-                  } else {
-                    _pageController.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                },
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.folder_open),
-                    label: "Processos",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month_outlined),
-                    label: "Agenda",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.notifications_active_outlined),
-                    label: "Notificação",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.menu),
-                    label: "Menu",
-                  ),
-                ],
-              ),
-            ),
           ),
+          bottomNavigationBar: width < 800
+              ? Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: width * 0.02,
+                    vertical: height * 0.01,
+                  ),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 30,
+                        offset: Offset(2, height * 0.02),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BottomNavigationBar(
+                      currentIndex: myCurrentIndex,
+                      selectedFontSize: width * 0.04,
+                      showSelectedLabels: true,
+                      showUnselectedLabels: false,
+                      onTap: (index) {
+                        if (index == 3) {
+                          _scaffoldKey.currentState?.openEndDrawer();
+                        } else {
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.folder_open),
+                          label: "Processos",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.calendar_month_outlined),
+                          label: "Agenda",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.notifications_active_outlined),
+                          label: "Notificação",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.menu),
+                          label: "Menu",
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : null,
         ),
       ),
     );

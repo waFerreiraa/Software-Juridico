@@ -14,7 +14,6 @@ class _ProcessosPageState extends State<ProcessosPage> {
   @override
   void initState() {
     super.initState();
-    // Define cor fixa da barra de status para modo claro
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -25,8 +24,6 @@ class _ProcessosPageState extends State<ProcessosPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -41,9 +38,9 @@ class _ProcessosPageState extends State<ProcessosPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: <Widget>[
+        actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list_outlined, size: 31),
+            icon: const Icon(Icons.filter_list_outlined, size: 28),
             tooltip: 'Ativos',
             onPressed: () {
               Navigator.push(
@@ -53,7 +50,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.add, size: 30),
+            icon: const Icon(Icons.add, size: 28),
             tooltip: 'Adicionar Processo',
             onPressed: () {
               Navigator.push(
@@ -63,79 +60,84 @@ class _ProcessosPageState extends State<ProcessosPage> {
             },
           ),
         ],
-        iconTheme: IconThemeData(color: theme.iconTheme.color),
-        flexibleSpace: Container(color: theme.scaffoldBackgroundColor),
       ),
-      body: Builder(
-        builder: (context) {
-          bool isScrollable = screenHeight * 0.8 < screenHeight;
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= 800;
+          final double maxContentWidth = isDesktop ? 700 : constraints.maxWidth * 0.9;
 
-          if (isScrollable) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              child: _buildContent(context, screenWidth, theme, screenHeight),
-            );
-          } else {
-            return _buildContent(context, screenWidth, theme, screenHeight);
-          }
+          return Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxContentWidth),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/Advogado_.png',
+                      width: isDesktop ? 400 : constraints.maxWidth * 0.6,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "Gerencie e organize seus projetos com facilidade.",
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Tenha todos os casos do seu escritório em um só lugar!",
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      "Você pode adicionar nas duas formas abaixo.",
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 25),
+                    isDesktop
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(child: _infoCard(
+                                context: context,
+                                title: "Com o número do CNJ",
+                                description: "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
+                              )),
+                              const SizedBox(width: 20),
+                              Expanded(child: _infoCard(
+                                context: context,
+                                title: "Cadastro em lote com número OAB",
+                                description: "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
+                              )),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              _infoCard(
+                                context: context,
+                                title: "Com o número do CNJ",
+                                description: "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
+                              ),
+                              _infoCard(
+                                context: context,
+                                title: "Cadastro em lote com número OAB",
+                                description: "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
+                              ),
+                            ],
+                          ),
+                  ],
+                ),
+              ),
+            ),
+          );
         },
       ),
-    );
-  }
-
-  Widget _buildContent(
-    BuildContext context,
-    double screenWidth,
-    ThemeData theme,
-    double screenHeight,
-  ) {
-    return Column(
-      children: [
-        Center(
-          child: Image.asset(
-            'assets/Advogado_.png',
-            width: screenWidth * 0.6,
-            fit: BoxFit.contain,
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.all(screenWidth * 0.04),
-          child: Column(
-            children: [
-              Text(
-                "Gerencie e organize seus projetos com facilidade.",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: screenHeight * 0.015),
-              Text(
-                "Tenha todos os casos do seu escritório em um só lugar!",
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium,
-              ),
-              Text(
-                "Você pode adicionar nas duas formas abaixo.",
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-        _infoCard(
-          context: context,
-          title: "Com o número do CNJ",
-          description:
-              "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
-        ),
-        _infoCard(
-          context: context,
-          title: "Cadastro em lote com número OAB",
-          description:
-              "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
-        ),
-      ],
     );
   }
 
@@ -145,14 +147,11 @@ class _ProcessosPageState extends State<ProcessosPage> {
     required String description,
   }) {
     final theme = Theme.of(context);
-    final cardColor = const Color(0xffE0D3CA); // cor fixa para modo claro
+    final cardColor = const Color(0xffE0D3CA);
 
     return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      margin: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.width * 0.03,
-      ),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(15),
@@ -167,7 +166,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.008),
+          const SizedBox(height: 8),
           Text(
             description,
             style: theme.textTheme.bodySmall?.copyWith(
