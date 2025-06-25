@@ -30,6 +30,7 @@ class _CadProState extends State<CadPro> {
   final andamentoCtrl = TextEditingController();
   final faseCtrl = TextEditingController();
   final assuntoCtrl = TextEditingController();
+  final historicoCtrl = TextEditingController();
 
   final nomeParteCtrl = TextEditingController();
   final cpfCnpjCtrl = TextEditingController();
@@ -133,6 +134,7 @@ class _CadProState extends State<CadPro> {
       'andamento': andamentoCtrl.text,
       'fase_processual': faseCtrl.text,
       'assunto': assuntoCtrl.text,
+      'historico': historicoCtrl.text,
       'partes': partes,
       'status': 'ativo',
       'usuarioId': FirebaseAuth.instance.currentUser!.uid,
@@ -164,6 +166,7 @@ class _CadProState extends State<CadPro> {
     enderecoCtrl.clear();
     advogadoCtrl.clear();
     oabCtrl.clear();
+    historicoCtrl.clear();
   }
 
   Widget _buildForm(List<String> campos, List<TextEditingController> controllers,
@@ -231,6 +234,7 @@ class _CadProState extends State<CadPro> {
         "Andamento*",
         "Fase Processual*",
         "Assunto*",
+        "Historico*",
       ],
       [
         numeroCtrl,
@@ -242,6 +246,7 @@ class _CadProState extends State<CadPro> {
         andamentoCtrl,
         faseCtrl,
         assuntoCtrl,
+        historicoCtrl,
       ],
       largura,
       formatadores: [
@@ -254,11 +259,13 @@ class _CadProState extends State<CadPro> {
         FilteringTextInputFormatter.singleLineFormatter,
         FilteringTextInputFormatter.singleLineFormatter,
         FilteringTextInputFormatter.singleLineFormatter,
+        FilteringTextInputFormatter.singleLineFormatter,
       ],
       teclados: [
         TextInputType.number,
         TextInputType.datetime,
         TextInputType.number,
+        TextInputType.text,
         TextInputType.text,
         TextInputType.text,
         TextInputType.text,

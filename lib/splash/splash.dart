@@ -39,16 +39,31 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF5E293B), // mesma cor do splash nativo
-      body: Center(
-        child: FadeTransition(
-          opacity: _animation,
-          child: Image.asset('assets/icon/splash.png', width: 150),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Color(0xFF490A1D),
+    body: Center(
+      child: FadeTransition(
+        opacity: _animation,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/icon/splash.png', width: 150),
+            const SizedBox(height: 16),
+            const Text(
+              'BETA',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

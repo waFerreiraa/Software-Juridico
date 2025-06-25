@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 
 class DetalhesProcessoScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class DetalhesProcessoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalhes do Processo'),
+        title: const Text('Detalhes do Processo', style: TextStyle(color: Colors.white),),
         backgroundColor: const Color(0xff5E293B),
       ),
       body: Padding(

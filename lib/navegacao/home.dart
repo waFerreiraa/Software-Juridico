@@ -9,6 +9,7 @@ import 'package:jurisolutions/navegacao/notificacao_page.dart';
 import 'package:jurisolutions/navegacao/perfil.dart';
 import 'package:jurisolutions/navegacao/processos_page.dart';
 import 'package:jurisolutions/navegacao/reset_senha.dart';
+import 'package:jurisolutions/navegacao/suporte.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -94,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                     'Menu',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: width * 0.06,
+                      fontSize: width * 0.04,
                     ),
                   ),
                 ),
@@ -105,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Perfil",
-                    style: TextStyle(fontSize: width * 0.045),
+                    style: TextStyle(fontSize: width * 0.015),
                   ),
                   onTap: () {
                     Navigator.of(context).push(
@@ -120,11 +121,26 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Resetar Senha",
-                    style: TextStyle(fontSize: width * 0.045),
+                    style: TextStyle(fontSize: width * 0.015),
                   ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => ResetPass()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.support_agent_rounded,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  title: Text(
+                    "Suporte",
+                    style: TextStyle(fontSize: width * 0.015),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => SuportePage()),
                     );
                   },
                 ),
@@ -135,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Modo Noturno",
-                    style: TextStyle(fontSize: width * 0.045),
+                    style: TextStyle(fontSize: width * 0.015),
                   ),
                   value: isDarkMode,
                   onChanged: (value) {
@@ -151,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Deslogar",
-                    style: TextStyle(fontSize: width * 0.045),
+                    style: TextStyle(fontSize: width * 0.015),
                   ),
                   onTap: () async {
                     await AutenticacaoServicos().deslogar();
@@ -197,7 +213,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     selectedLabelTextStyle: TextStyle(
                       color: theme.bottomNavigationBarTheme.selectedItemColor,
-                      fontSize: width * 0.015,
+                      fontSize: width * 0.012,
+                      fontWeight: FontWeight.w500
                     ),
                     destinations: const [
                       NavigationRailDestination(

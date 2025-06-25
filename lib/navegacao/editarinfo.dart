@@ -21,7 +21,8 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
   late TextEditingController faseController;
   late TextEditingController assuntoController;
 
-  final String usuarioId = FirebaseAuth.instance.currentUser!.uid; // Pega o ID do usuário logado
+  final String usuarioId =
+      FirebaseAuth.instance.currentUser!.uid; // Pega o ID do usuário logado
 
   @override
   void initState() {
@@ -40,10 +41,11 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
   }
 
   Future<void> _carregarProcesso() async {
-    DocumentSnapshot processoDoc = await FirebaseFirestore.instance
-        .collection('processos')
-        .doc(widget.processoId)
-        .get();
+    DocumentSnapshot processoDoc =
+        await FirebaseFirestore.instance
+            .collection('processos')
+            .doc(widget.processoId)
+            .get();
 
     final processoData = processoDoc.data() as Map<String, dynamic>;
 
@@ -60,7 +62,9 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
     } else {
       // Caso o processo não pertença ao usuário logado, exibe um erro
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Você não tem permissão para editar este processo.')),
+        const SnackBar(
+          content: Text('Você não tem permissão para editar este processo.'),
+        ),
       );
       Navigator.pop(context); // Retorna à tela anterior
     }
@@ -72,13 +76,13 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
           .collection('processos')
           .doc(widget.processoId)
           .update({
-        'numero': numeroController.text,
-        'vara': varaController.text,
-        'tribunal': tribunalController.text,
-        'andamento': andamentoController.text,
-        'fase_processual': faseController.text,
-        'assunto': assuntoController.text,
-      });
+            'numero': numeroController.text,
+            'vara': varaController.text,
+            'tribunal': tribunalController.text,
+            'andamento': andamentoController.text,
+            'fase_processual': faseController.text,
+            'assunto': assuntoController.text,
+          });
 
       // Volta para a tela de Casos Ativos
       Navigator.pop(context);
@@ -141,7 +145,9 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
                 ),
                 TextFormField(
                   controller: faseController,
-                  decoration: const InputDecoration(labelText: 'Fase Processual'),
+                  decoration: const InputDecoration(
+                    labelText: 'Fase Processual',
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Campo obrigatório';
@@ -166,8 +172,18 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
                     backgroundColor: const Color(0xff5E293B),
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child: const Text('Salvar', style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Salvar',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),

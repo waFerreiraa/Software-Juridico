@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jurisolutions/navegacao/Vizualizar.dart';
-import 'package:jurisolutions/navegacao/editarinfo.dart'; // Ajuste o caminho se necessário
- // Importe a tela nova (ajuste caminho)
+import 'package:jurisolutions/navegacao/editarinfo.dart';
 
 class CasosAtivos extends StatefulWidget {
   const CasosAtivos({super.key});
@@ -39,7 +38,7 @@ class _CasosAtivosState extends State<CasosAtivos> {
       appBar: AppBar(
         title: const Text(
           'Casos Ativos',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xff5E293B),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -76,9 +75,22 @@ class _CasosAtivosState extends State<CasosAtivos> {
                       processosAtivos[index].data() as Map<String, dynamic>;
                   final processoId = processosAtivos[index].id;
 
+                  // Extrair nome do cliente dentro da lista 'partes'
+                  String nomeCliente = 'Não informado';
+                  if (processo['partes'] != null &&
+                      processo['partes'] is List &&
+                      processo['partes'].isNotEmpty) {
+                    final partes = List.from(processo['partes']);
+                    final primeiraParte = partes[0];
+                    if (primeiraParte is Map<String, dynamic> &&
+                        primeiraParte.containsKey('nome')) {
+                      nomeCliente = primeiraParte['nome'];
+                    }
+                  }
+
                   return Card(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 8),
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -91,9 +103,10 @@ class _CasosAtivosState extends State<CasosAtivos> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => DetalhesProcessoScreen(
-                              numero: processo['numero'] ?? 'nome',
-                              nomeCliente: processo['nomeCliente'] ?? 'Não informado',
-                              historico: processo['historico'] ?? 'Sem histórico disponível',
+                              numero: processo['numero'] ?? 'N/A',
+                              nomeCliente: nomeCliente,
+                              historico: processo['historico'] ??
+                                  'Sem histórico disponível',
                             ),
                           ),
                         );
@@ -104,7 +117,7 @@ class _CasosAtivosState extends State<CasosAtivos> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Número: ${processo['numero']}',
+                              'Número: ${processo['numero'] ?? "N/A"}',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -112,15 +125,11 @@ class _CasosAtivosState extends State<CasosAtivos> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Vara: ${processo['vara']}',
+                              'Cliente: $nomeCliente',
                               style: const TextStyle(fontSize: 16),
                             ),
                             Text(
-                              'Tribunal: ${processo['tribunal']}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            Text(
-                              'Andamento: ${processo['andamento']}',
+                              'Histórico: ${processo['historico'] ?? "Sem histórico"}',
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 8),
@@ -148,8 +157,8 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                     ),
                                     const SizedBox(width: 16),
                                     IconButton(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.blue),
+                                      icon:
+                                          const Icon(Icons.edit, color: Colors.blue),
                                       tooltip: 'Editar processo',
                                       onPressed: () {
                                         Navigator.push(
@@ -164,14 +173,15 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                       },
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.red),
+                                      icon:
+                                          const Icon(Icons.delete, color: Colors.red),
                                       tooltip: 'Excluir processo',
                                       onPressed: () async {
                                         final confirmar = await showDialog<bool>(
                                           context: context,
                                           builder: (context) => AlertDialog(
-                                            title: const Text('Confirmar exclusão'),
+                                            title:
+                                                const Text('Confirmar exclusão'),
                                             content: const Text(
                                                 'Tem certeza que deseja excluir este processo?'),
                                             actions: [
