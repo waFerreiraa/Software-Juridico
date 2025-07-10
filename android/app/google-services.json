@@ -1,21 +1,30 @@
 {
   "project_info": {
-    "project_number": "123599106616",
-    "project_id": "jurisolutions-3ed1f",
-    "storage_bucket": "jurisolutions-3ed1f.firebasestorage.app"
+    "project_number": "221563948679",
+    "project_id": "jurisolutions",
+    "storage_bucket": "jurisolutions.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123599106616:android:1c696a030420e2b734accd",
+        "mobilesdk_app_id": "1:221563948679:android:c77ac9757e4bcde89f7222",
         "android_client_info": {
           "package_name": "com.example.jurisolutions"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "221563948679-i3tiotovkjhiin1crk7vt33n6p6d9cng.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jurisolutions",
+            "certificate_hash": "3e73830371620d90e198e3b359e7f46f05dff92a"
+          }
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDXY02sSauQVLxFcYGK5_iOverLeGcww2A"
+          "current_key": "AIzaSyD2PmWc-_7g5ZxTjFeT26jQmSWd79XUYh4"
         }
       ],
       "services": {

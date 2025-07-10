@@ -187,7 +187,7 @@ class _CadastroPageState extends State<CadastroPage> {
                       ),
                     )
                     : const Text(
-                      "Me cadastrar",
+                      "Cadastrar",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

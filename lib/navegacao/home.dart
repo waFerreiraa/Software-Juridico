@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                     'Menu',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: width * 0.04,
+                      fontSize: width * 0.06,
                     ),
                   ),
                 ),
@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Perfil",
-                    style: TextStyle(fontSize: width * 0.015),
+                    style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () {
                     Navigator.of(context).push(
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Resetar Senha",
-                    style: TextStyle(fontSize: width * 0.015),
+                    style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () {
                     Navigator.of(context).push(
@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Suporte",
-                    style: TextStyle(fontSize: width * 0.015),
+                    style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () {
                     Navigator.of(context).push(
@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Modo Noturno",
-                    style: TextStyle(fontSize: width * 0.015),
+                    style: TextStyle(fontSize: width * 0.045),
                   ),
                   value: isDarkMode,
                   onChanged: (value) {
@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: Text(
                     "Deslogar",
-                    style: TextStyle(fontSize: width * 0.015),
+                    style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () async {
                     await AutenticacaoServicos().deslogar();
