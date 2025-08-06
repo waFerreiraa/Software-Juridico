@@ -25,9 +25,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -41,51 +47,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyB4IrWei4Xb9gLf6n7puUaYejue33Mwrog',
-    appId: '1:221563948679:web:74c7a4ba03dbd17d9f7222',
-    messagingSenderId: '221563948679',
-    projectId: 'jurisolutions',
-    authDomain: 'jurisolutions.firebaseapp.com',
-    storageBucket: 'jurisolutions.firebasestorage.app',
-    measurementId: 'G-L3WVVX6JF8',
+    apiKey: 'AIzaSyDFhl0dubrTAhziZoPNfz11wpDokkzMk5c',
+    appId: '1:898076500947:web:479ed27856f346b1eb0526',
+    messagingSenderId: '898076500947',
+    projectId: 'jurisolutio',
+    authDomain: 'jurisolutio.firebaseapp.com',
+    storageBucket: 'jurisolutio.firebasestorage.app',
+    measurementId: 'G-CJP9DFJJN5',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD2PmWc-_7g5ZxTjFeT26jQmSWd79XUYh4',
-    appId: '1:221563948679:android:c77ac9757e4bcde89f7222',
-    messagingSenderId: '221563948679',
-    projectId: 'jurisolutions',
-    storageBucket: 'jurisolutions.firebasestorage.app',
+    apiKey: 'AIzaSyDT6naWxdIJw5u1znXsI1HXsLldY7-OS0c',
+    appId: '1:898076500947:android:b206b68c9fe8fd02eb0526',
+    messagingSenderId: '898076500947',
+    projectId: 'jurisolutio',
+    storageBucket: 'jurisolutio.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCsEWhyctc8vyI80VzUYAijGgzVTPwk9Qw',
-    appId: '1:221563948679:ios:606b2f198f7f0ceb9f7222',
-    messagingSenderId: '221563948679',
-    projectId: 'jurisolutions',
-    storageBucket: 'jurisolutions.firebasestorage.app',
-    androidClientId: '221563948679-i3tiotovkjhiin1crk7vt33n6p6d9cng.apps.googleusercontent.com',
-    iosBundleId: 'com.example.jurisolutions',
+    apiKey: 'AIzaSyCS6rapMPJ1fgs-7zOBeAUtJc2QMUT3iww',
+    appId: '1:898076500947:ios:eb47bff25ce28206eb0526',
+    messagingSenderId: '898076500947',
+    projectId: 'jurisolutio',
+    storageBucket: 'jurisolutio.firebasestorage.app',
+    iosBundleId: 'com.example.jurisolutionss',
   );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCsEWhyctc8vyI80VzUYAijGgzVTPwk9Qw',
-    appId: '1:221563948679:ios:606b2f198f7f0ceb9f7222',
-    messagingSenderId: '221563948679',
-    projectId: 'jurisolutions',
-    storageBucket: 'jurisolutions.firebasestorage.app',
-    androidClientId: '221563948679-i3tiotovkjhiin1crk7vt33n6p6d9cng.apps.googleusercontent.com',
-    iosBundleId: 'com.example.jurisolutions',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBsaiAu7LXxFBelwKAo41wUmLXeVtcUQ4Y',
-    appId: '1:123599106616:web:d35862b013fa8a0334accd',
-    messagingSenderId: '123599106616',
-    projectId: 'jurisolutions-3ed1f',
-    authDomain: 'jurisolutions-3ed1f.firebaseapp.com',
-    storageBucket: 'jurisolutions-3ed1f.firebasestorage.app',
-    measurementId: 'G-DFNF0RQRDZ',
-  );
-
 }

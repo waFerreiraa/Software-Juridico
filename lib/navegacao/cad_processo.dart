@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 enum CadProcesso { geral, partes }
 
@@ -59,6 +60,8 @@ class _CadProState extends State<CadPro> {
     useSymbolPadding: true,
   );
 
+  String? fcmToken;
+
   @override
   void initState() {
     super.initState();
@@ -68,11 +71,28 @@ class _CadProState extends State<CadPro> {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
+
+    _initFCMToken();
+  }
+
+  Future<void> _initFCMToken() async {
+    fcmToken = await FirebaseMessaging.instance.getToken();
+    print('Token FCM obtido: $fcmToken');
+
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      setState(() {
+        fcmToken = newToken;
+      });
+      print('Token FCM atualizado: $newToken');
+    });
   }
 
   InputDecoration meuInputDecoration(String label) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 12.0),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 14.0,
+        horizontal: 12.0,
+      ),
       filled: true,
       fillColor: const Color(0xffE0D3CA),
       labelText: label,
@@ -112,42 +132,61 @@ class _CadProState extends State<CadPro> {
   }
 
   Future<void> salvarNoFirestore() async {
-    final partes = [
-      {
-        'nome': nomeParteCtrl.text,
-        'cpf_cnpj': cpfCnpjCtrl.text,
-        'endereco': enderecoCtrl.text,
-        'advogado': advogadoCtrl.text,
-        'oab': oabCtrl.text,
-      },
-    ];
-
-    final dados = {
-      'numero': numeroCtrl.text,
-      'data': dataCtrl.text,
-      'valor': double.tryParse(
-              valorCtrl.text.replaceAll(RegExp(r'[^0-9,]'), '').replaceAll(',', '.')) ??
-          0.0,
-      'vara': varaCtrl.text,
-      'tribunal': tribunalCtrl.text,
-      'juizado': juizadoCtrl.text,
-      'andamento': andamentoCtrl.text,
-      'fase_processual': faseCtrl.text,
-      'assunto': assuntoCtrl.text,
-      'historico': historicoCtrl.text,
-      'partes': partes,
-      'status': 'ativo',
-      'usuarioId': FirebaseAuth.instance.currentUser!.uid,
-    };
-
     try {
+      // Converte a data do campo para DateTime
+      DateTime dataConvertida = DateFormat('dd/MM/yyyy').parse(dataCtrl.text);
+
+      // Monta o objeto partes (lista de mapas)
+      final partes = [
+        {
+          'nome': nomeParteCtrl.text,
+          'cpf_cnpj': cpfCnpjCtrl.text,
+          'endereco': enderecoCtrl.text,
+          'advogado': advogadoCtrl.text,
+          'oab': oabCtrl.text,
+        },
+      ];
+
+      final dados = {
+        'numero': numeroCtrl.text,
+        'data': dataCtrl.text,
+        'dataTimestamp': Timestamp.fromDate(dataConvertida),
+        'valor':
+            double.tryParse(
+              valorCtrl.text
+                  .replaceAll(RegExp(r'[^0-9,]'), '')
+                  .replaceAll(',', '.'),
+            ) ??
+            0.0,
+        'vara': varaCtrl.text,
+        'tribunal': tribunalCtrl.text,
+        'juizado': juizadoCtrl.text,
+        'andamento': andamentoCtrl.text,
+        'fase_processual': faseCtrl.text,
+        'assunto': assuntoCtrl.text,
+        'historico': historicoCtrl.text,
+        'partes': partes,
+        'status': 'ativo',
+        'usuarioId': FirebaseAuth.instance.currentUser!.uid,
+        'token': fcmToken, // 🟢 Token FCM do dispositivo
+        'notificado': false, // 🟢 flag para backend controlar notificações
+      };
+
+      // Salva no Firestore
       await FirebaseFirestore.instance.collection('processos').add(dados);
+
+      // Feedback para o usuário
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processo salvo com sucesso!')),
       );
+
+      // Limpa os campos do formulário
       _limparCampos();
     } catch (e) {
       print('Erro ao salvar processo: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao salvar processo: $e')));
     }
   }
 
@@ -169,10 +208,13 @@ class _CadProState extends State<CadPro> {
     historicoCtrl.clear();
   }
 
-  Widget _buildForm(List<String> campos, List<TextEditingController> controllers,
-      double largura,
-      {List<TextInputFormatter>? formatadores,
-      List<TextInputType>? teclados}) {
+  Widget _buildForm(
+    List<String> campos,
+    List<TextEditingController> controllers,
+    double largura, {
+    List<TextInputFormatter>? formatadores,
+    List<TextInputType>? teclados,
+  }) {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: largura),
@@ -181,12 +223,20 @@ class _CadProState extends State<CadPro> {
             for (int i = 0; i < campos.length; i++) ...[
               TextFormField(
                 controller: controllers[i],
-                inputFormatters: formatadores != null ? [formatadores[i]] : null,
-                keyboardType: teclados != null ? teclados[i] : TextInputType.text,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                inputFormatters:
+                    formatadores != null ? [formatadores[i]] : null,
+                keyboardType:
+                    teclados != null ? teclados[i] : TextInputType.text,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
                 decoration: meuInputDecoration(campos[i]),
                 readOnly: campos[i] == "Data*",
-                onTap: campos[i] == "Data*" ? () => _selecionarData(context) : null,
+                onTap:
+                    campos[i] == "Data*"
+                        ? () => _selecionarData(context)
+                        : null,
               ),
               const SizedBox(height: 20),
             ],
@@ -310,13 +360,20 @@ class _CadProState extends State<CadPro> {
         elevation: 0,
         title: const Text(
           "Cadastro de Processo",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Colors.black,
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(95),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 10.0,
+            ),
             child: Center(
               child: IntrinsicWidth(
                 child: SegmentedButton<CadProcesso>(
@@ -325,18 +382,30 @@ class _CadProState extends State<CadPro> {
                     foregroundColor: Colors.black,
                     selectedForegroundColor: Colors.white,
                     selectedBackgroundColor: const Color(0xff5E293B),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                   ),
                   segments: const [
                     ButtonSegment<CadProcesso>(
                       value: CadProcesso.geral,
-                      label: Text("Informações Gerais",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      label: Text(
+                        "Informações Gerais",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
                     ButtonSegment<CadProcesso>(
                       value: CadProcesso.partes,
-                      label: Text("Partes Envolvidas",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      label: Text(
+                        "Partes Envolvidas",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
                   ],
                   selected: <CadProcesso>{cadproView},
@@ -358,8 +427,10 @@ class _CadProState extends State<CadPro> {
             child: Center(
               child: Column(
                 children: [
-                  if (cadproView == CadProcesso.geral) _buildInformacoesGerais(larguraMax),
-                  if (cadproView == CadProcesso.partes) _buildPartesEnvolvidas(larguraMax),
+                  if (cadproView == CadProcesso.geral)
+                    _buildInformacoesGerais(larguraMax),
+                  if (cadproView == CadProcesso.partes)
+                    _buildPartesEnvolvidas(larguraMax),
                 ],
               ),
             ),

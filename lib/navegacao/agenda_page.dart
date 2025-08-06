@@ -1,139 +1,61 @@
-import 'dart:convert'; // <--- IMPORTANTE!
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
 
-class AgendaPage extends StatefulWidget {
-  const AgendaPage({super.key});
+class GoogleLoginWidget extends StatefulWidget {
+  const GoogleLoginWidget({Key? key}) : super(key: key);
 
   @override
-  State<AgendaPage> createState() => _AgendaPageState();
+  State<GoogleLoginWidget> createState() => _GoogleLoginWidgetState();
 }
 
-class _AgendaPageState extends State<AgendaPage> {
+class _GoogleLoginWidgetState extends State<GoogleLoginWidget> {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+    scopes: ['email', 'https://www.googleapis.com/auth/calendar'],
   );
 
-  List<dynamic> eventos = [];
-  bool carregando = false;
-  String erro = '';
+  GoogleSignInAccount? _currentUser;
+  String _status = 'Não autenticado';
 
-  Future<bool> _requestCalendarPermission() async {
-    // ignore: deprecated_member_use
-    var status = await Permission.calendar.status;
-    if (!status.isGranted) {
-      // ignore: deprecated_member_use
-      status = await Permission.calendar.request();
-    }
-    return status.isGranted;
-  }
-
-  Future<void> fazerLoginEListarEventos() async {
-    setState(() {
-      carregando = true;
-      erro = '';
-    });
-
+  Future<void> _handleSignIn() async {
     try {
-      final conta = await _googleSignIn.signIn();
-      final auth = await conta?.authentication;
-      final token = auth?.accessToken;
-
-      if (token == null) {
-        setState(() {
-          erro = 'Token de acesso não encontrado.';
-          carregando = false;
-        });
-        return;
-      }
-
-      final hasPermission = await _requestCalendarPermission();
-      if (!hasPermission) {
-        setState(() {
-          erro = 'Permissão de acesso ao calendário não concedida.';
-          carregando = false;
-        });
-        return;
-      }
-
-      final agora = DateTime.now().toUtc().toIso8601String();
-      final url =
-          'https://www.googleapis.com/calendar/v3/calendars/primary/events'
-          '?timeMin=$agora'
-          '&singleEvents=true'
-          '&orderBy=startTime'
-          '&maxResults=10';
-
-      final resposta = await http.get(
-        Uri.parse(url),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (resposta.statusCode == 200) {
-        final dados = jsonDecode(resposta.body);
-        setState(() {
-          eventos = dados['items'] ?? [];
-        });
-      } else {
-        setState(() {
-          erro = 'Erro ao carregar eventos: ${resposta.statusCode} - ${resposta.reasonPhrase ?? resposta.body}';
-        });
-      }
-    } catch (e) {
+      final account = await _googleSignIn.signIn();
       setState(() {
-        erro = 'Erro: $e';
+        _currentUser = account;
+        _status =
+            account != null
+                ? 'Logado como: ${account.email}'
+                : 'Login cancelado';
+      });
+    } catch (error) {
+      setState(() {
+        _status = 'Erro ao logar: $error';
       });
     }
+  }
 
+  Future<void> _handleSignOut() async {
+    await _googleSignIn.signOut();
     setState(() {
-      carregando = false;
+      _currentUser = null;
+      _status = 'Desconectado';
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Minha Agenda')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: carregando
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  if (_googleSignIn.currentUser == null)
-                    ElevatedButton.icon(
-                      onPressed: fazerLoginEListarEventos,
-                      icon: const Icon(Icons.login),
-                      label: const Text('Login com Google'),
-                    ),
-                  const SizedBox(height: 20),
-                  if (erro.isNotEmpty)
-                    Text(erro, style: const TextStyle(color: Colors.red)),
-                  if (eventos.isEmpty && erro.isEmpty)
-                    const Text('Nenhum evento encontrado.')
-                  else if (eventos.isNotEmpty)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: eventos.length,
-                        itemBuilder: (context, index) {
-                          final evento = eventos[index];
-                          final titulo = evento['summary'] ?? 'Sem título';
-                          final inicio = evento['start']?['dateTime'] ??
-                              evento['start']?['date'] ??
-                              '';
-                          return ListTile(
-                            leading: const Icon(Icons.event),
-                            title: Text(titulo),
-                            subtitle: Text('Início: $inicio'),
-                          );
-                        },
-                      ),
-                    ),
-                ],
-              ),
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(_status),
+        const SizedBox(height: 20),
+        if (_currentUser == null)
+          ElevatedButton(
+            onPressed: _handleSignIn,
+            child: const Text('Fazer login com Google'),
+          )
+        else
+          ElevatedButton(onPressed: _handleSignOut, child: const Text('Sair')),
+      ],
     );
   }
 }

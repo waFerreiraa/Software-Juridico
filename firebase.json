@@ -1,1 +1,37 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"jurisolutions","appId":"1:221563948679:android:c77ac9757e4bcde89f7222","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"jurisolutions","configurations":{"android":"1:221563948679:android:c77ac9757e4bcde89f7222","ios":"1:221563948679:ios:606b2f198f7f0ceb9f7222","macos":"1:221563948679:ios:606b2f198f7f0ceb9f7222","web":"1:221563948679:web:74c7a4ba03dbd17d9f7222"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "jurisolutio",
+          "appId": "1:898076500947:android:b206b68c9fe8fd02eb0526",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "jurisolutio",
+          "configurations": {
+            "android": "1:898076500947:android:b206b68c9fe8fd02eb0526",
+            "ios": "1:898076500947:ios:eb47bff25ce28206eb0526",
+            "web": "1:898076500947:web:479ed27856f346b1eb0526"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": []
+    }
+  ]
+}

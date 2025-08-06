@@ -11,18 +11,21 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  firebase_core: ^3.13.0
-  firebase_auth: ^5.5.2
-  cloud_firestore: ^5.6.7
+  firebase_messaging: ^16.0.0
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.0
+  cloud_firestore: ^6.0.0
   cpf_cnpj_validator: ^2.0.0 # Para validar CPF e CNPJ
-  intl: ^0.18.0 # Para formatação de data
-  mask_text_input_formatter: ^2.5.0
-  flutter_multi_formatter: ^2.10.1
+  intl: ^0.20.2 # Para formatação de data
+  mask_text_input_formatter: ^2.9.0
+  flutter_multi_formatter: ^2.13.7
   google_sign_in: ^6.1.4
   http: ^1.2.1
   googleapis: ^14.0.0
   googleapis_auth: ^2.0.0
   permission_handler: ^12.0.0+1
+  flutter_local_notifications: ^19.4.0
+  timezone: ^0.10.1
 
 dev_dependencies:
   flutter_test:

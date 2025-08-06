@@ -1,21 +1,20 @@
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    namespace = "com.example.jurisolutions"
+    namespace = "com.example.jurisolutionss"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        // ✅ Kotlin DSL usa set para isso
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -23,21 +22,15 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.jurisolutions"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "com.example.jurisolutionss"
         minSdk = 30
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-     
     }
 
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release    build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+        getByName("release") {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -45,4 +38,13 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+
+      implementation("com.google.firebase:firebase-messaging:23.4.1")
+      
+    // ✅ Usar esta forma em Kotlin DSL
+    add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.1.5")
+
 }

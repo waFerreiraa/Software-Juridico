@@ -10,6 +10,10 @@ import 'package:jurisolutions/navegacao/perfil.dart';
 import 'package:jurisolutions/navegacao/processos_page.dart';
 import 'package:jurisolutions/navegacao/reset_senha.dart';
 import 'package:jurisolutions/navegacao/suporte.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:jurisolutions/navegacao/vencidos.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,18 +29,54 @@ class _HomePageState extends State<HomePage> {
   DateTime? ultimaPressao;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isDarkMode = false;
+  String? _fcmToken;
 
   @override
   void initState() {
     super.initState();
-    pages = [ProcessosPage(), AgendaPage(), NotificacaoPage()];
+    pages = [ProcessosPage(), GoogleLoginWidget(), NotificacaoPage()];
     _pageController = PageController(initialPage: myCurrentIndex);
+    _configurarFirebaseMessaging();
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  Future<void> _configurarFirebaseMessaging() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('Permissão concedida para notificações');
+    }
+
+    String? token = await messaging.getToken();
+    print('Token FCM: $token');
+    setState(() {
+      _fcmToken = token;
+    });
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && token != null) {
+      await FirebaseFirestore.instance.collection('usuarios').doc(user.uid).set(
+        {'fcmToken': token},
+        SetOptions(merge: true),
+      );
+    }
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Mensagem recebida em foreground: ${message.notification?.title}');
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Usuário abriu a notificação');
+      _pageController.animateToPage(
+        2,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   Future<bool> _onWillPop() async {
@@ -54,28 +94,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
 
-    final ThemeData theme = isDarkMode
-        ? ThemeData.dark().copyWith(
-            iconTheme: const IconThemeData(color: Color(0xFFE0D3CA)),
-            bottomNavigationBarTheme: BottomNavigationBarThemeData(
-              selectedItemColor: const Color(0xFFE0D3CA),
-              unselectedItemColor: const Color(0xFFE0D3CA).withOpacity(0.5),
-              backgroundColor: Colors.black,
-            ),
-          )
-        : ThemeData.light().copyWith(
-            iconTheme: const IconThemeData(color: Colors.black),
-            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              selectedItemColor: Color(0xff5E293B),
-              unselectedItemColor: Colors.black,
-              backgroundColor: Colors.white,
-            ),
-          );
+    final ThemeData theme =
+        isDarkMode
+            ? ThemeData.dark().copyWith(
+              iconTheme: const IconThemeData(color: Color(0xFFE0D3CA)),
+              bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                selectedItemColor: const Color(0xFFE0D3CA),
+                unselectedItemColor: const Color(0xFFE0D3CA).withOpacity(0.5),
+                backgroundColor: Colors.black,
+              ),
+            )
+            : ThemeData.light().copyWith(
+              iconTheme: const IconThemeData(color: Colors.black),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                selectedItemColor: Color(0xff5E293B),
+                unselectedItemColor: Colors.black,
+                backgroundColor: Colors.white,
+              ),
+            );
 
     return Theme(
       data: theme,
@@ -89,7 +136,8 @@ class _HomePageState extends State<HomePage> {
               children: [
                 DrawerHeader(
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[800] : const Color(0xff5E293B),
+                    color:
+                        isDarkMode ? Colors.grey[800] : const Color(0xff5E293B),
                   ),
                   child: Text(
                     'Menu',
@@ -108,11 +156,10 @@ class _HomePageState extends State<HomePage> {
                     "Perfil",
                     style: TextStyle(fontSize: width * 0.045),
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => PerfilPage()),
-                    );
-                  },
+                  onTap:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => PerfilPage()),
+                      ),
                 ),
                 ListTile(
                   leading: Icon(
@@ -123,11 +170,10 @@ class _HomePageState extends State<HomePage> {
                     "Resetar Senha",
                     style: TextStyle(fontSize: width * 0.045),
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ResetPass()),
-                    );
-                  },
+                  onTap:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ResetPass()),
+                      ),
                 ),
                 ListTile(
                   leading: Icon(
@@ -138,11 +184,26 @@ class _HomePageState extends State<HomePage> {
                     "Suporte",
                     style: TextStyle(fontSize: width * 0.045),
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SuportePage()),
-                    );
-                  },
+                  onTap:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => SuportePage()),
+                      ),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.close_sharp,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  title: Text(
+                    "Casos Vencidos",
+                    style: TextStyle(fontSize: width * 0.045),
+                  ),
+                  onTap:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => CasosVencidos(),
+                        ),
+                      ),
                 ),
                 SwitchListTile(
                   secondary: Icon(
@@ -154,11 +215,7 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: width * 0.045),
                   ),
                   value: isDarkMode,
-                  onChanged: (value) {
-                    setState(() {
-                      isDarkMode = value;
-                    });
-                  },
+                  onChanged: (value) => setState(() => isDarkMode = value),
                 ),
                 ListTile(
                   leading: Icon(
@@ -171,11 +228,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onTap: () async {
                     await AutenticacaoServicos().deslogar();
-
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => InicioTela(),
-                      ),
+                      MaterialPageRoute(builder: (context) => InicioTela()),
                       (route) => false,
                     );
                   },
@@ -198,13 +252,12 @@ class _HomePageState extends State<HomePage> {
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
-                        setState(() {
-                          myCurrentIndex = index;
-                        });
+                        setState(() => myCurrentIndex = index);
                       }
                     },
                     labelType: NavigationRailLabelType.selected,
-                    backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+                    backgroundColor:
+                        theme.bottomNavigationBarTheme.backgroundColor,
                     selectedIconTheme: IconThemeData(
                       color: theme.bottomNavigationBarTheme.selectedItemColor,
                     ),
@@ -214,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                     selectedLabelTextStyle: TextStyle(
                       color: theme.bottomNavigationBarTheme.selectedItemColor,
                       fontSize: width * 0.012,
-                      fontWeight: FontWeight.w500
+                      fontWeight: FontWeight.w500,
                     ),
                     destinations: const [
                       NavigationRailDestination(
@@ -238,72 +291,71 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: PageView(
                     controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        myCurrentIndex = index;
-                      });
-                    },
+                    onPageChanged:
+                        (index) => setState(() => myCurrentIndex = index),
                     children: pages,
                   ),
                 ),
               ],
             ),
           ),
-          bottomNavigationBar: width < 800
-              ? Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: width * 0.02,
-                    vertical: height * 0.01,
-                  ),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 30,
-                        offset: Offset(2, height * 0.02),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BottomNavigationBar(
-                      currentIndex: myCurrentIndex,
-                      selectedFontSize: width * 0.04,
-                      showSelectedLabels: true,
-                      showUnselectedLabels: false,
-                      onTap: (index) {
-                        if (index == 3) {
-                          _scaffoldKey.currentState?.openEndDrawer();
-                        } else {
-                          _pageController.animateToPage(
-                            index,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
-                      items: const [
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.folder_open),
-                          label: "Processos",
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.calendar_month_outlined),
-                          label: "Agenda",
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.notifications_active_outlined),
-                          label: "Notificação",
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.menu),
-                          label: "Menu",
+          bottomNavigationBar:
+              width < 800
+                  ? Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: width * 0.02,
+                      vertical: height * 0.01,
+                    ),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 30,
+                          offset: Offset(2, height * 0.02),
                         ),
                       ],
                     ),
-                  ),
-                )
-              : null,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: BottomNavigationBar(
+                        currentIndex: myCurrentIndex,
+                        selectedFontSize: width * 0.04,
+                        showSelectedLabels: true,
+                        showUnselectedLabels: false,
+                        onTap: (index) {
+                          if (index == 3) {
+                            _scaffoldKey.currentState?.openEndDrawer();
+                          } else {
+                            _pageController.animateToPage(
+                              index,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                        items: const [
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.folder_open),
+                            label: "Processos",
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.calendar_month_outlined),
+                            label: "Agenda",
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.notifications_active_outlined),
+                            label: "Notificação",
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.menu),
+                            label: "Menu",
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  : null,
+          bottomSheet: null, // <- Aqui removemos a exibição do token
         ),
       ),
     );

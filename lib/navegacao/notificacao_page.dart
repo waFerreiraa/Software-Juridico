@@ -6,9 +6,7 @@ class NotificacaoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text("essa é a pagina de notificação"),
-      ),
+      body: Center(child: Text("essa é a pagina de notificação")),
     );
   }
 }
