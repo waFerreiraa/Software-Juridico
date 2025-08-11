@@ -1,16 +1,34 @@
-# jurisolutions
+# 📱 JuriSolutions — Gestão de Processos Jurídicos
 
-A new Flutter project.
+<p align="center">
+  <img src="assets/icon/icon.png" alt="Banner do JurisApp" width="300"/>
+</p>
 
-## Getting Started
+**JuriSolutions** é um aplicativo que permite cadastrar, gerenciar e acompanhar processos jurídicos, enviando notificações automáticas quando estiver próximo do vencimento.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Funcionalidades
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- 📂 Cadastro de processos com título, data e detalhes
+- 🔔 Notificações automáticas antes do vencimento
+- 📅 Visualização por data
+- 📱 Interface responsiva e intuitiva
+- 🔐 Autenticação segura
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="assets/tela 2.jpg" width="250"/>
+  <img src="assets/tela 3.jpg" width="250"/>
+  <img src="assets/tela 1.jpg" width="250"/>
+</p>
+
+---
+
+## 📧 Contato
+
+**E-mail:** walisson.almm@gmail.com  
+**Desenvolvedor:** Walisson Almeida

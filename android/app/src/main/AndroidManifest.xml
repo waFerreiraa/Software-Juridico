@@ -10,6 +10,7 @@
         android:label="Juri Solutions"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
+        
 
         <!-- Meta-data importante para o Google Play Services -->
         <meta-data
