@@ -208,6 +208,7 @@ class _LoginPageState extends State<LoginPage> {
     String senha = _senhaController.text.trim();
 
     if (_formkey.currentState!.validate()) {
+      setState(() => _carregando = true);
       if (queroEntrar) {
         final erro = await _Auten.logarUsuarios(email: email, senha: senha);
         if (erro != null) {
@@ -219,6 +220,7 @@ class _LoginPageState extends State<LoginPage> {
           );
         }
       }
+      setState(() => _carregando = false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Preencha todos os campos corretamente.")),

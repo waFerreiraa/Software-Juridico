@@ -100,18 +100,12 @@ class InicioTela extends StatelessWidget {
       children: [
         Text(
           "Deixe seu dia a dia mais prático com",
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w900,
-          ),
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900),
           textAlign: TextAlign.center,
         ),
         Text(
           "o nosso aplicativo",
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w900,
-          ),
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
@@ -140,9 +134,15 @@ class InicioTela extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
-          child: const Text("Começar grátis", style: TextStyle(color: Colors.white)),
+          child: const Text(
+            "Começar grátis",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
 
         const SizedBox(height: 20),
@@ -162,7 +162,10 @@ class InicioTela extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 18,
+            ),
           ),
           child: const Text("Já sou cadastrado"),
         ),

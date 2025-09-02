@@ -12,7 +12,12 @@
           "package_name": "com.example.jurisolutions"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "898076500947-aqhfmg8oumiqc8lrsi1jgg1dqqbq8he6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDT6naWxdIJw5u1znXsI1HXsLldY7-OS0c"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898076500947-aqhfmg8oumiqc8lrsi1jgg1dqqbq8he6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "898076500947-d493d1ob1cflp4v9rv1eej4ctnd6e7qr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jurisolutions"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +48,20 @@
           "package_name": "com.example.jurisolutionss"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "898076500947-q2o5vnhd57jsqiu66526m1140n0pvkav.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jurisolutionss",
+            "certificate_hash": "3e73830371620d90e198e3b359e7f46f05dff92a"
+          }
+        },
+        {
+          "client_id": "898076500947-aqhfmg8oumiqc8lrsi1jgg1dqqbq8he6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDT6naWxdIJw5u1znXsI1HXsLldY7-OS0c"
@@ -39,7 +69,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898076500947-aqhfmg8oumiqc8lrsi1jgg1dqqbq8he6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "898076500947-d493d1ob1cflp4v9rv1eej4ctnd6e7qr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jurisolutions"
+              }
+            }
+          ]
         }
       }
     }

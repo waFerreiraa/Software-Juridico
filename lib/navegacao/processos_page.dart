@@ -64,7 +64,8 @@ class _ProcessosPageState extends State<ProcessosPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth >= 800;
-          final double maxContentWidth = isDesktop ? 700 : constraints.maxWidth * 0.9;
+          final double maxContentWidth =
+              isDesktop ? 700 : constraints.maxWidth * 0.9;
 
           return Center(
             child: SingleChildScrollView(
@@ -79,7 +80,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                       width: isDesktop ? 400 : constraints.maxWidth * 0.6,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 50),
                     Text(
                       "Gerencie e organize seus projetos com facilidade.",
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -99,38 +100,91 @@ class _ProcessosPageState extends State<ProcessosPage> {
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium,
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 50),
                     isDesktop
                         ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(child: _infoCard(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: _infoCard(
                                 context: context,
                                 title: "Com o número do CNJ",
-                                description: "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
-                              )),
-                              const SizedBox(width: 20),
-                              Expanded(child: _infoCard(
+                                description:
+                                    "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: _infoCard(
                                 context: context,
                                 title: "Cadastro em lote com número OAB",
-                                description: "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
-                              )),
-                            ],
-                          )
+                                description:
+                                    "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
+                              ),
+                            ),
+                          ],
+                        )
                         : Column(
-                            children: [
-                              _infoCard(
-                                context: context,
-                                title: "Com o número do CNJ",
-                                description: "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CadPro(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(320, 45),
+                                elevation: 4,
+                                shadowColor: const Color.fromARGB(
+                                  255,
+                                  74,
+                                  43,
+                                  53,
+                                ),
+                                backgroundColor: const Color(0xff5E293B),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
                               ),
-                              _infoCard(
-                                context: context,
-                                title: "Cadastro em lote com número OAB",
-                                description: "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
+                              child: Text(
+                                "Adicionar Processo",
+                                style: TextStyle(
+                                  fontSize: 19,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,  
+                                  MaterialPageRoute(
+                                    builder: (context) => CadPro(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xff5E293B),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                              ),
+                              child: Text(
+                                "Adicionar Processo",
+                                style: TextStyle(
+                                  fontSize: 19,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                   ],
                 ),
               ),

@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/navegacao/agenda_page.dart';
 import 'package:jurisolutions/navegacao/inicio.dart';
 import 'package:jurisolutions/navegacao/notificacao_page.dart';
@@ -10,10 +9,11 @@ import 'package:jurisolutions/navegacao/perfil.dart';
 import 'package:jurisolutions/navegacao/processos_page.dart';
 import 'package:jurisolutions/navegacao/reset_senha.dart';
 import 'package:jurisolutions/navegacao/suporte.dart';
+import 'package:jurisolutions/navegacao/vencidos.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:jurisolutions/navegacao/vencidos.dart';
+import '../models/google_login_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,10 +31,17 @@ class _HomePageState extends State<HomePage> {
   bool isDarkMode = false;
   String? _fcmToken;
 
+  // Serviço de login Google
+  final GoogleLoginService _loginService = GoogleLoginService();
+
   @override
   void initState() {
     super.initState();
-    pages = [ProcessosPage(), GoogleLoginWidget(), NotificacaoPage()];
+    pages = [
+      ProcessosPage(),
+      AgendaWidget(loginService: _loginService), // <- Agenda integrada
+      NotificacaoPage(),
+    ];
     _pageController = PageController(initialPage: myCurrentIndex);
     _configurarFirebaseMessaging();
   }
@@ -48,10 +55,12 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // ignore: avoid_print
       print('Permissão concedida para notificações');
     }
 
     String? token = await messaging.getToken();
+    // ignore: avoid_print
     print('Token FCM: $token');
     setState(() {
       _fcmToken = token;
@@ -227,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: width * 0.045),
                   ),
                   onTap: () async {
-                    await AutenticacaoServicos().deslogar();
+                    await _loginService.signOut(); // <- Logout Google
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (context) => InicioTela()),
                       (route) => false,
@@ -355,7 +364,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )
                   : null,
-          bottomSheet: null, // <- Aqui removemos a exibição do token
         ),
       ),
     );

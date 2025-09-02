@@ -125,7 +125,8 @@ class _ResetPassState extends State<ResetPass> {
       } else {
         mostrarSnackBar(
           context: context,
-          texto: "Um link para a redefinição de senha foi enviado para seu E-mail!",
+          texto:
+              "Um link para a redefinição de senha foi enviado para seu E-mail!",
           backgroundColor: Colors.green,
         );
         _formKey.currentState!.reset();
