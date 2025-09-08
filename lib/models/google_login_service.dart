@@ -30,9 +30,15 @@ class GoogleLoginService {
   }
 
   /// Logout
+  /// Logout (sair do app sem revogar a conta)
   Future<void> signOut() async {
-    await _googleSignIn.disconnect();
-    currentUser = null;
+    try {
+      await _googleSignIn.signOut(); // ✅ apenas encerra a sessão
+    } catch (e) {
+      print("Erro ao sair do Google: $e");
+    } finally {
+      currentUser = null;
+    }
   }
 
   /// Listener p/ mudanças de usuário

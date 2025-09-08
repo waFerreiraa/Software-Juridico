@@ -38,28 +38,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list_outlined, size: 28),
-            tooltip: 'Ativos',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CasosAtivos()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, size: 28),
-            tooltip: 'Adicionar Processo',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CadPro()),
-              );
-            },
-          ),
-        ],
+        // Removidos os IconButton
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -95,11 +74,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 5),
-                    Text(
-                      "Você pode adicionar nas duas formas abaixo.",
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium,
-                    ),
+
                     const SizedBox(height: 50),
                     isDesktop
                         ? Row(
@@ -158,24 +133,32 @@ class _ProcessosPageState extends State<ProcessosPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.push(
-                                  context,  
+                                  context,
                                   MaterialPageRoute(
-                                    builder: (context) => CadPro(),
+                                    builder: (context) => CasosAtivos(),
                                   ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
+                                minimumSize: Size(320, 45),
+                                elevation: 4,
+                                shadowColor: const Color.fromARGB(
+                                  255,
+                                  74,
+                                  43,
+                                  53,
+                                ),
                                 backgroundColor: const Color(0xff5E293B),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(9),
                                 ),
                               ),
                               child: Text(
-                                "Adicionar Processo",
+                                "Casos Ativos",
                                 style: TextStyle(
                                   fontSize: 19,
                                   color: Colors.white,
