@@ -1,16 +1,13 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
-import 'package:jurisolutions/models/cadastro_model.dart';
-import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:jurisolutions/models/cadastro_model.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/login.dart';
-
-// ignore: unused_element
-bool _senhaVisivel = false;
-// ignore: unused_element
-bool _confirmarSenhaVisivel = false;
+import 'package:jurisolutions/navegacao/home.dart';
+import 'package:jurisolutions/services/google_login_service.dart'; // Serviço do Google
 
 bool _carregando = false;
 
@@ -30,6 +27,26 @@ class _CadastroPageState extends State<CadastroPage> {
   final _confirmarSenhaController = TextEditingController();
 
   final _auten = AutenticacaoServicos();
+  final GoogleLoginService _googleLoginService = GoogleLoginService();
+
+  /// Função para login com Google
+  Future<void> _loginWithGoogle() async {
+    try {
+      final account = await _googleLoginService.signIn();
+      if (account != null) {
+        print("Usuário logado: ${account.displayName} (${account.email})");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        print("Login cancelado pelo usuário");
+      }
+    } catch (error) {
+      print("Erro no login com Google: $error");
+    }
+  }
 
   InputDecoration meuInputDecoration(String label, IconData icon) {
     return InputDecoration(
@@ -69,25 +86,24 @@ class _CadastroPageState extends State<CadastroPage> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child:
-                kIsWeb
-                    ? Container(
-                      constraints: const BoxConstraints(maxWidth: 600),
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: _buildForm(),
-                    )
-                    : _buildForm(),
+            child: kIsWeb
+                ? Container(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: _buildForm(),
+                  )
+                : _buildForm(),
           ),
         ),
       ),
@@ -105,6 +121,7 @@ class _CadastroPageState extends State<CadastroPage> {
           ),
           const SizedBox(height: 38),
 
+          // Nome
           TextFormField(
             controller: _nomeController,
             validator: (value) {
@@ -117,6 +134,7 @@ class _CadastroPageState extends State<CadastroPage> {
           ),
           const SizedBox(height: 25),
 
+          // E-mail
           TextFormField(
             controller: _emailController,
             validator: (value) {
@@ -128,43 +146,35 @@ class _CadastroPageState extends State<CadastroPage> {
             decoration: meuInputDecoration("E-mail", Icons.email),
           ),
           const SizedBox(height: 25),
+
+          // Senha
           CampoSenha(
             controller: _senhaController,
             hintText: "Senha",
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "A senha não pode ser vazia.";
-              }
-              if (value.length < 6) {
-                return "A senha deve ter pelo menos 6 caracteres";
-              }
+              if (value == null || value.isEmpty) return "A senha não pode ser vazia";
+              if (value.length < 6) return "A senha deve ter pelo menos 6 caracteres";
               return null;
             },
             decoration: meuInputDecoration("Senha", Icons.lock),
           ),
-
           const SizedBox(height: 25),
 
+          // Confirmar senha
           CampoSenha(
             controller: _confirmarSenhaController,
             hintText: "Confirme sua senha",
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "A senha não pode ser vazia.";
-              }
-              if (value.length < 6) {
-                return "A senha deve ter pelo menos 6 caracteres";
-              }
-              if (value != _senhaController.text) {
-                return "As senhas não coincidem";
-              }
+              if (value == null || value.isEmpty) return "A senha não pode ser vazia";
+              if (value.length < 6) return "A senha deve ter pelo menos 6 caracteres";
+              if (value != _senhaController.text) return "As senhas não coincidem";
               return null;
             },
             decoration: meuInputDecoration("Confirme sua senha", Icons.lock),
           ),
-
           const SizedBox(height: 30),
 
+          // Botão de cadastro
           ElevatedButton(
             onPressed: _carregando ? null : botaoPrincipalClicado,
             style: ElevatedButton.styleFrom(
@@ -176,25 +186,68 @@ class _CadastroPageState extends State<CadastroPage> {
                 borderRadius: BorderRadius.circular(9),
               ),
             ),
-            child:
-                _carregando
-                    ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Color.fromARGB(255, 173, 98, 123),
-                        strokeWidth: 2.8,
-                      ),
-                    )
-                    : const Text(
-                      "Cadastrar",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+            child: _carregando
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Color.fromARGB(255, 173, 98, 123),
+                      strokeWidth: 2.8,
                     ),
-                  
+                  )
+                : const Text(
+                    "Cadastrar",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+
+          const SizedBox(height: 25),
+
+          // Texto "Ou faça login com Google"
+          const Text(
+            "Ou faça login com o Google",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Botão do Google
+          InkWell(
+            onTap: _loginWithGoogle,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/google_logo.png', // Logo do Google
+                    height: 24,
+                    width: 24,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Entrar com Google",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

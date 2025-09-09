@@ -1,12 +1,13 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously, non_constant_identifier_names
 
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/home.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:jurisolutions/navegacao/reset_senha.dart';
+import 'package:jurisolutions/models/google_login_service.dart'; // seu serviço de GoogleLoginService
 
 bool _carregando = false;
 
@@ -26,6 +27,28 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
 
+  final GoogleLoginService _googleLoginService = GoogleLoginService();
+
+  /// Função para login com Google (usando o serviço da agenda)
+  Future<void> _loginWithGoogle() async {
+    try {
+      final account = await _googleLoginService.signIn();
+      if (account != null) {
+        print("Usuário logado: ${account.displayName} (${account.email})");
+
+        // Navegar para Home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        print("Login cancelado pelo usuário");
+      }
+    } catch (error) {
+      print("Erro no login com Google: $error");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,25 +57,24 @@ class _LoginPageState extends State<LoginPage> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child:
-                kIsWeb
-                    ? Container(
-                      constraints: const BoxConstraints(maxWidth: 500),
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: _buildForm(),
-                    )
-                    : _buildForm(),
+            child: kIsWeb
+                ? Container(
+                    constraints: const BoxConstraints(maxWidth: 500),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: _buildForm(),
+                  )
+                : _buildForm(),
           ),
         ),
       ),
@@ -63,8 +85,6 @@ class _LoginPageState extends State<LoginPage> {
     final isMobile = MediaQuery.of(context).size.width < 600;
     final double imageSize = isMobile ? 200 : 300;
     final double inputFontSize = isMobile ? 18 : 22;
-    final double buttonFontSize = isMobile ? 21 : 24;
-    final double buttonWidth = isMobile ? 280 : 320;
     final double buttonHeight = isMobile ? 55 : 65;
 
     return Form(
@@ -79,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SizedBox(height: 40),
 
+          // E-mail
           TextFormField(
             controller: _emailController,
             validator: (value) {
@@ -98,12 +119,13 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SizedBox(height: 25),
 
+          // Senha
           CampoSenha(
             controller: _senhaController,
             hintText: "Senha",
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "A senha não pode ser vazia.";
+                return "A senha não pode ser vazia";
               }
               if (value.length < 5) {
                 return "A senha é muito curta";
@@ -115,10 +137,11 @@ class _LoginPageState extends State<LoginPage> {
 
           const SizedBox(height: 45),
 
+          // Botão de login tradicional
           ElevatedButton(
             onPressed: _carregando ? null : botaoPrincipalClicado,
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(300, 55),
+              minimumSize: Size(double.infinity, buttonHeight),
               elevation: 4,
               shadowColor: const Color.fromARGB(255, 64, 27, 39),
               backgroundColor: const Color(0xff5E293B),
@@ -126,28 +149,28 @@ class _LoginPageState extends State<LoginPage> {
                 borderRadius: BorderRadius.circular(9),
               ),
             ),
-            child:
-                _carregando
-                    ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Color.fromARGB(255, 173, 98, 123),
-                        strokeWidth: 2.8,
-                      ),
-                    )
-                    : const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+            child: _carregando
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Color.fromARGB(255, 173, 98, 123),
+                      strokeWidth: 2.8,
                     ),
+                  )
+                : const Text(
+                    "Login",
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
 
           const SizedBox(height: 25),
 
+          // Esqueci minha senha
           TextButton(
             onPressed: () {
               Navigator.push(
@@ -161,6 +184,51 @@ class _LoginPageState extends State<LoginPage> {
                 fontSize: inputFontSize,
                 fontWeight: FontWeight.bold,
                 color: const Color.fromARGB(255, 69, 68, 68),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 40),
+
+          // Texto "Ou faça login com Google"
+          const Text(
+            "Ou faça login com o Google",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Botão do Google
+          InkWell(
+            onTap: _loginWithGoogle,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/google_logo.png', // Logo do Google nos assets
+                    height: 24,
+                    width: 24,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Entrar com Google",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
