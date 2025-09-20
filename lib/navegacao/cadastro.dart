@@ -7,7 +7,6 @@ import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/login.dart';
 import 'package:jurisolutions/navegacao/home.dart';
-import 'package:jurisolutions/services/google_login_service.dart'; // Serviço do Google
 
 bool _carregando = false;
 
@@ -27,26 +26,7 @@ class _CadastroPageState extends State<CadastroPage> {
   final _confirmarSenhaController = TextEditingController();
 
   final _auten = AutenticacaoServicos();
-  final GoogleLoginService _googleLoginService = GoogleLoginService();
-
-  /// Função para login com Google
-  Future<void> _loginWithGoogle() async {
-    try {
-      final account = await _googleLoginService.signIn();
-      if (account != null) {
-        print("Usuário logado: ${account.displayName} (${account.email})");
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        print("Login cancelado pelo usuário");
-      }
-    } catch (error) {
-      print("Erro no login com Google: $error");
-    }
-  }
+  
 
   InputDecoration meuInputDecoration(String label, IconData icon) {
     return InputDecoration(
@@ -217,38 +197,6 @@ class _CadastroPageState extends State<CadastroPage> {
             ),
           ),
           const SizedBox(height: 10),
-
-          // Botão do Google
-          InkWell(
-            onTap: _loginWithGoogle,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey),
-                color: Colors.white,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    'assets/google_logo.png', // Logo do Google
-                    height: 24,
-                    width: 24,
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "Entrar com Google",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
