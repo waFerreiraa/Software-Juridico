@@ -4,19 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "name": "JuriSolutions",
+            "name": "Software-Juridico",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "jurisolutions (profile mode)",
+            "name": "Software-Juridico (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "JuriSolutions (release mode)",
+            "name": "Software-Juridico (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
