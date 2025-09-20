@@ -150,10 +150,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Text(
                     'Menu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: width * 0.06,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 45),
                   ),
                 ),
                 ListTile(
@@ -167,7 +164,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onTap:
                       () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => PerfilPage()),
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  Theme(data: theme, child: PerfilPage()),
+                        ),
                       ),
                 ),
                 ListTile(
@@ -181,7 +182,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onTap:
                       () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ResetPass()),
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  Theme(data: theme, child: ResetPass()),
+                        ),
                       ),
                 ),
                 ListTile(
@@ -195,7 +200,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onTap:
                       () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => SuportePage()),
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  Theme(data: theme, child: SuportePage()),
+                        ),
                       ),
                 ),
                 ListTile(
@@ -210,7 +219,9 @@ class _HomePageState extends State<HomePage> {
                   onTap:
                       () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => CasosVencidos(),
+                          builder:
+                              (context) =>
+                                  Theme(data: theme, child: CasosVencidos()),
                         ),
                       ),
                 ),
@@ -238,7 +249,11 @@ class _HomePageState extends State<HomePage> {
                   onTap: () async {
                     await _loginService.signOut(); // <- Logout Google
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => InicioTela()),
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                Theme(data: theme, child: InicioTela()),
+                      ),
                       (route) => false,
                     );
                   },

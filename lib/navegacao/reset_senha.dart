@@ -30,10 +30,16 @@ class _ResetPassState extends State<ResetPass> {
       fillColor: const Color(0xffE0D3CA),
       labelText: label,
       labelStyle: const TextStyle(
+        fontSize: 20, // tamanho quando dentro do input
         color: Color.fromARGB(255, 132, 114, 102),
-        fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
+      floatingLabelStyle: const TextStyle(
+        fontSize: 25, // tamanho quando sobe
+        color: Color(0xFF490A1D), // cor quando está focado
+        fontWeight: FontWeight.w700,
+      ),
+
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -52,7 +58,7 @@ class _ResetPassState extends State<ResetPass> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Reset Password")),
+      appBar: AppBar(title: Text("Resetar Senha")),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -79,7 +85,7 @@ class _ResetPassState extends State<ResetPass> {
                 ),
                 SizedBox(height: 20),
                 SizedBox(
-                  width: 220,
+                  width: 400,
                   height: 55,
                   child: ElevatedButton(
                     onPressed: _carregando ? null : botaoPrincipalClicado,

@@ -1,12 +1,13 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously, non_constant_identifier_names
 
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:jurisolutions/models/cadastro_model.dart';
 import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/home.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:jurisolutions/navegacao/reset_senha.dart';
+// import 'package:jurisolutions/models/google_login_service copy.dart'; // seu serviço de GoogleLoginService
 
 bool _carregando = false;
 
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -61,24 +62,21 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildForm() {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    final double imageSize = isMobile ? 200 : 300;
+    final double imageSize = isMobile ? 145 : 280;
     final double inputFontSize = isMobile ? 18 : 22;
-    final double buttonFontSize = isMobile ? 21 : 24;
-    final double buttonWidth = isMobile ? 280 : 320;
     final double buttonHeight = isMobile ? 55 : 65;
 
     return Form(
       key: _formkey,
       child: Column(
         children: [
-          const SizedBox(height: 40),
-          Image.asset(
-            'assets/LogoTelaLogin.png',
-            width: imageSize,
-            height: imageSize,
+          CircleAvatar(
+            radius: 80, // metade do tamanho da imagem
+            backgroundImage: AssetImage('assets/icon/icon.png'),
           ),
-          const SizedBox(height: 40),
 
+          const SizedBox(height: 55),
+          // E-mail
           TextFormField(
             controller: _emailController,
             validator: (value) {
@@ -98,12 +96,13 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SizedBox(height: 25),
 
+          // Senha
           CampoSenha(
             controller: _senhaController,
             hintText: "Senha",
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "A senha não pode ser vazia.";
+                return "A senha não pode ser vazia";
               }
               if (value.length < 5) {
                 return "A senha é muito curta";
@@ -113,23 +112,44 @@ class _LoginPageState extends State<LoginPage> {
             decoration: _inputDecoration(label: 'Senha', icon: Icons.lock),
           ),
 
-          const SizedBox(height: 45),
+          const SizedBox(height: 15),
 
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ResetPass()),
+              );
+            },
+            child: Text(
+              "Esqueceu a senha?",
+              style: TextStyle(
+                fontSize: inputFontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF490A1D),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // Botão de login tradicional
           ElevatedButton(
             onPressed: _carregando ? null : botaoPrincipalClicado,
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(300, 55),
+              minimumSize: Size(double.infinity, buttonHeight),
               elevation: 4,
               shadowColor: const Color.fromARGB(255, 64, 27, 39),
-              backgroundColor: const Color(0xff5E293B),
+              backgroundColor: const Color(0xFF490A1D),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(9),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             child:
                 _carregando
                     ? const SizedBox(
                       width: 24,
+
                       height: 24,
                       child: CircularProgressIndicator(
                         color: Color.fromARGB(255, 173, 98, 123),
@@ -147,23 +167,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
 
           const SizedBox(height: 25),
-
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ResetPass()),
-              );
-            },
-            child: Text(
-              "Esqueci minha senha",
-              style: TextStyle(
-                fontSize: inputFontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 69, 68, 68),
-              ),
-            ),
-          ),
+          const SizedBox(height: 10),
 
           const SizedBox(height: 40),
         ],
@@ -185,12 +189,18 @@ class _LoginPageState extends State<LoginPage> {
       fillColor: const Color(0xffE0D3CA),
       labelText: label,
       labelStyle: const TextStyle(
+        fontSize: 20, // tamanho quando dentro do input
         color: Color.fromARGB(255, 132, 114, 102),
         fontWeight: FontWeight.bold,
       ),
+      floatingLabelStyle: const TextStyle(
+        fontSize: 25, // tamanho quando sobe
+        color: Color(0xFF490A1D), // cor quando está focado
+        fontWeight: FontWeight.w700,
+      ),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(
           color: Color.fromARGB(255, 181, 164, 150),
           width: 2,

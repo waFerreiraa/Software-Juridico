@@ -13,7 +13,7 @@ class AgendaWidget extends StatefulWidget {
 }
 
 class _AgendaWidgetState extends State<AgendaWidget> {
-  List<cal.Event> _eventos = [];
+  final ValueNotifier<List<cal.Event>> _eventosNotifier = ValueNotifier([]);
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -26,31 +26,28 @@ class _AgendaWidgetState extends State<AgendaWidget> {
   @override
   void initState() {
     super.initState();
+    _initLogin();
+  }
 
-    // Tenta login silencioso
-    widget.loginService.signInSilently().then((_) {
-      if (widget.loginService.currentUser != null) {
-        _carregarEventos(); // Carrega os eventos se já estiver logado
-      }
-      setState(() {});
-    });
-    // Listener para mudanças de usuário
-    widget.loginService.onCurrentUserChanged.listen((user) {
-      if (user != null) _carregarEventos();
-      setState(() {});
+  void _initLogin() async {
+    await widget.loginService.signInSilently();
+    if (widget.loginService.currentUser != null) {
+      await _carregarEventos();
+    }
+
+    widget.loginService.onCurrentUserChanged.listen((user) async {
+      if (user != null) await _carregarEventos();
     });
   }
 
   Future<void> _carregarEventos() async {
     if (_calendarService == null) return;
     final eventos = await _calendarService!.listarEventos();
-    setState(() {
-      _eventos = eventos;
-    });
+    _eventosNotifier.value = eventos;
   }
 
   List<cal.Event> _eventosDoDia(DateTime dia) {
-    return _eventos.where((e) {
+    return _eventosNotifier.value.where((e) {
       final start = e.start?.dateTime ?? e.start?.date;
       return start != null &&
           start.year == dia.year &&
@@ -187,186 +184,99 @@ class _AgendaWidgetState extends State<AgendaWidget> {
   Widget build(BuildContext context) {
     final user = widget.loginService.currentUser;
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (user == null)
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Ícone ou ilustração
-                      Icon(
-                        Icons.calendar_today,
-                        size: 120,
-                        color: Color(0xff5E293B),
-                      ),
-                      const SizedBox(height: 24),
-                      // Texto explicativo
-                      const Text(
-                        'Para acessar sua agenda e receber notificações, faça login com sua conta Google.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Botão de login
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          await widget.loginService.signIn();
-                          await _carregarEventos();
-                        },
-                        icon: const Icon(Icons.login, color: Colors.white),
-                        label: const Text(
-                          'Login com Google',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          backgroundColor: const Color(0xff5E293B),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          else ...[
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                child: Row(
-                  children: [
-                    if (user.photoUrl != null)
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(user.photoUrl!),
-                      )
-                    else
-                      const CircleAvatar(radius: 20, child: Icon(Icons.person)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        user.email,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await widget.loginService.signOut();
-                        setState(() {
-                          _eventos = [];
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(10, 35),
-                        elevation: 2,
-                        shadowColor: const Color.fromARGB(255, 64, 27, 39),
-                        backgroundColor: const Color(0xff5E293B),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        'Sair',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _abrirDialogoNovoEvento,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(10, 45),
-                elevation: 2,
-                shadowColor: const Color.fromARGB(255, 64, 27, 39),
-                backgroundColor: const Color(0xff5E293B),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text(
-                'Criar novo evento',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Column(
+      child:
+          user == null
+              ? _LoginView(
+                loginService: widget.loginService,
+                onLogin: _carregarEventos,
+              )
+              : Column(
                 children: [
-                  TableCalendar(
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(2030, 12, 31),
-                    focusedDay: _focusedDay,
-                    calendarFormat: _calendarFormat,
-                    selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
-                    onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
+                  UserHeader(
+                    user: user,
+                    onSignOut: () async {
+                      await widget.loginService.signOut();
+                      _eventosNotifier.value = [];
                     },
-                    onFormatChanged: (format) {
-                      setState(() {
-                        _calendarFormat = format;
-                      });
-                    },
-                    eventLoader: _eventosDoDia,
-                    calendarStyle: const CalendarStyle(
-                      todayDecoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      selectedDecoration: BoxDecoration(
-                        color: Colors.orange,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    locale: 'pt_BR',
                   ),
                   const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _abrirDialogoNovoEvento,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(10, 45),
+                      elevation: 2,
+                      shadowColor: const Color.fromARGB(255, 64, 27, 39),
+                      backgroundColor: const Color(0xff5E293B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      'Criar novo evento',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Expanded(
-                    child:
-                        _selectedDay == null
-                            ? const Center(
-                              child: Text(
-                                'Selecione um dia para ver os eventos',
-                              ),
-                            )
-                            : ListView(
-                              children:
-                                  _eventosDoDia(_selectedDay!).map((e) {
+                    child: Column(
+                      children: [
+                        TableCalendar(
+                          firstDay: DateTime.utc(2020, 1, 1),
+                          lastDay: DateTime.utc(2030, 12, 31),
+                          focusedDay: _focusedDay,
+                          calendarFormat: _calendarFormat,
+                          selectedDayPredicate:
+                              (day) => isSameDay(day, _selectedDay),
+                          onDaySelected: (selectedDay, focusedDay) {
+                            setState(() {
+                              _selectedDay = selectedDay;
+                              _focusedDay = focusedDay;
+                            });
+                          },
+                          onFormatChanged: (format) {
+                            setState(() {
+                              _calendarFormat = format;
+                            });
+                          },
+                          eventLoader: _eventosDoDia,
+                          calendarStyle: const CalendarStyle(
+                            todayDecoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            selectedDecoration: BoxDecoration(
+                              color: Colors.orange,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          locale: 'pt_BR',
+                        ),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: ValueListenableBuilder<List<cal.Event>>(
+                            valueListenable: _eventosNotifier,
+                            builder: (context, eventos, _) {
+                              final eventosDia =
+                                  _selectedDay == null
+                                      ? []
+                                      : _eventosDoDia(_selectedDay!);
+                              if (_selectedDay == null) {
+                                return const Center(
+                                  child: Text(
+                                    'Selecione um dia para ver os eventos',
+                                  ),
+                                );
+                              }
+                              return RefreshIndicator(
+                                onRefresh: _carregarEventos,
+                                child: ListView.builder(
+                                  itemCount: eventosDia.length,
+                                  itemBuilder: (context, index) {
+                                    final e = eventosDia[index];
                                     final start =
                                         e.start?.dateTime ??
                                         e.start?.date ??
@@ -437,30 +347,140 @@ class _AgendaWidgetState extends State<AgendaWidget> {
                                                     ],
                                                   ),
                                             );
-                                            if (confirma == true) {
+                                            if (confirma == true)
                                               await _deletarEvento(e);
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'Evento "${e.summary}" deletado',
-                                                  ),
-                                                ),
-                                              );
-                                            }
                                           },
                                         ),
                                       ),
                                     );
-                                  }).toList(),
-                            ),
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
+    );
+  }
+}
+
+// =================== COMPONENTES ===================
+
+class _LoginView extends StatelessWidget {
+  final GoogleLoginService loginService;
+  final VoidCallback onLogin;
+  const _LoginView({required this.loginService, required this.onLogin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.calendar_today,
+                size: 120,
+                color: const Color(0xFF490A1D),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Para acessar sua agenda e receber notificações, faça login com sua conta Google.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await loginService.signIn();
+                  onLogin();
+                },
+                icon: const Icon(Icons.login, color: Colors.white),
+                label: const Text(
+                  'Login com Google',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: const Color(0xFF490A1D),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class UserHeader extends StatelessWidget {
+  final dynamic user;
+  final VoidCallback onSignOut;
+  const UserHeader({required this.user, required this.onSignOut});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            user.photoUrl != null
+                ? CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(user.photoUrl!),
+                )
+                : const CircleAvatar(radius: 20, child: Icon(Icons.person)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                user.email,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: onSignOut,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(10, 35),
+                elevation: 2,
+                shadowColor: const Color.fromARGB(255, 64, 27, 39),
+                backgroundColor: const Color(0xff5E293B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'Sair',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }

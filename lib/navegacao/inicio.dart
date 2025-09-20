@@ -2,12 +2,19 @@
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+// import 'package:jurisolutions/models/google_login_service copy.dart';
 import 'package:jurisolutions/navegacao/cadastro.dart';
+import 'package:jurisolutions/navegacao/home.dart';
 import 'package:jurisolutions/navegacao/login.dart';
 
-class InicioTela extends StatelessWidget {
+class InicioTela extends StatefulWidget {
   const InicioTela({super.key});
 
+  @override
+  State<InicioTela> createState() => _InicioTelaState();
+}
+
+class _InicioTelaState extends State<InicioTela> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -129,10 +136,10 @@ class InicioTela extends StatelessWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF5E293B),
+            backgroundColor: const Color(0xFF490A1D),
             minimumSize: Size(double.infinity, buttonHeight),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             textStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -160,7 +167,7 @@ class InicioTela extends StatelessWidget {
             foregroundColor: Colors.black87,
             minimumSize: Size(double.infinity, buttonHeight),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             textStyle: const TextStyle(
               fontWeight: FontWeight.w800,
@@ -168,6 +175,23 @@ class InicioTela extends StatelessWidget {
             ),
           ),
           child: const Text("Já sou cadastrado"),
+        ),
+
+        const SizedBox(height: 25),
+
+        // Texto "Ou faça login com Google"
+        Column(
+          children: [
+            const Text(
+              "Ou faça login com o Google",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ],
     );

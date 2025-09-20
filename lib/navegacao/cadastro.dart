@@ -1,16 +1,12 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
-import 'package:jurisolutions/models/cadastro_model.dart';
-import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:jurisolutions/models/cadastro_model.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/models/versenha.dart';
 import 'package:jurisolutions/navegacao/login.dart';
-
-// ignore: unused_element
-bool _senhaVisivel = false;
-// ignore: unused_element
-bool _confirmarSenhaVisivel = false;
+import 'package:jurisolutions/navegacao/home.dart';
 
 bool _carregando = false;
 
@@ -105,6 +101,7 @@ class _CadastroPageState extends State<CadastroPage> {
           ),
           const SizedBox(height: 38),
 
+          // Nome
           TextFormField(
             controller: _nomeController,
             validator: (value) {
@@ -117,6 +114,7 @@ class _CadastroPageState extends State<CadastroPage> {
           ),
           const SizedBox(height: 25),
 
+          // E-mail
           TextFormField(
             controller: _emailController,
             validator: (value) {
@@ -128,50 +126,47 @@ class _CadastroPageState extends State<CadastroPage> {
             decoration: meuInputDecoration("E-mail", Icons.email),
           ),
           const SizedBox(height: 25),
+
+          // Senha
           CampoSenha(
             controller: _senhaController,
             hintText: "Senha",
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "A senha não pode ser vazia.";
-              }
-              if (value.length < 6) {
+              if (value == null || value.isEmpty)
+                return "A senha não pode ser vazia";
+              if (value.length < 6)
                 return "A senha deve ter pelo menos 6 caracteres";
-              }
               return null;
             },
             decoration: meuInputDecoration("Senha", Icons.lock),
           ),
-
           const SizedBox(height: 25),
 
+          // Confirmar senha
           CampoSenha(
             controller: _confirmarSenhaController,
             hintText: "Confirme sua senha",
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "A senha não pode ser vazia.";
-              }
-              if (value.length < 6) {
+              if (value == null || value.isEmpty)
+                return "A senha não pode ser vazia";
+              if (value.length < 6)
                 return "A senha deve ter pelo menos 6 caracteres";
-              }
-              if (value != _senhaController.text) {
+              if (value != _senhaController.text)
                 return "As senhas não coincidem";
-              }
               return null;
             },
             decoration: meuInputDecoration("Confirme sua senha", Icons.lock),
           ),
-
           const SizedBox(height: 30),
 
+          // Botão de cadastro
           ElevatedButton(
             onPressed: _carregando ? null : botaoPrincipalClicado,
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(300, 55),
+              minimumSize: const Size(345, 55),
               elevation: 4,
               shadowColor: const Color.fromARGB(255, 64, 27, 39),
-              backgroundColor: const Color(0xff5E293B),
+              backgroundColor: const Color(0xFF490A1D),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(9),
               ),
@@ -194,8 +189,9 @@ class _CadastroPageState extends State<CadastroPage> {
                         color: Colors.white,
                       ),
                     ),
-                  
           ),
+
+          const SizedBox(height: 25),
         ],
       ),
     );

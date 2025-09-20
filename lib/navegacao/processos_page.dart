@@ -111,7 +111,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                minimumSize: Size(320, 45),
+                                minimumSize: Size(320, 48),
                                 elevation: 4,
                                 shadowColor: const Color.fromARGB(
                                   255,
@@ -119,7 +119,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                                   43,
                                   53,
                                 ),
-                                backgroundColor: const Color(0xff5E293B),
+                                backgroundColor: const Color(0xFF490A1D),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(9),
                                 ),
@@ -144,7 +144,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                minimumSize: Size(320, 45),
+                                minimumSize: Size(320, 48),
                                 elevation: 4,
                                 shadowColor: const Color.fromARGB(
                                   255,
@@ -152,7 +152,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                                   43,
                                   53,
                                 ),
-                                backgroundColor: const Color(0xff5E293B),
+                                backgroundColor: const Color(0xFF490A1D),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(9),
                                 ),

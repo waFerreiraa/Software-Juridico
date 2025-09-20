@@ -1,8 +1,8 @@
+// ignore: depend_on_referenced_packages
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-// ignore: depend_on_referenced_packages
 import 'package:flutter_localizations/flutter_localizations.dart'; // <--- adicionar
 import 'firebase_options.dart';
 import 'package:jurisolutions/navegacao/home.dart';
