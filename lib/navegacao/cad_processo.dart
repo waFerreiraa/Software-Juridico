@@ -7,8 +7,6 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-enum CadProcesso { geral, partes }
-
 class CadPro extends StatefulWidget {
   const CadPro({super.key});
 
@@ -17,15 +15,13 @@ class CadPro extends StatefulWidget {
 }
 
 class _CadProState extends State<CadPro> {
-  CadProcesso cadproView = CadProcesso.geral;
+  int _currentStep = 0;
 
   // Controllers
   final numeroCtrl = TextEditingController();
   final dataCtrl = TextEditingController();
   final valorCtrl = TextEditingController();
-  final varaCtrl = TextEditingController();
-  final tribunalCtrl = TextEditingController();
-  final juizadoCtrl = TextEditingController();
+  final numeroVaraCtrl = TextEditingController();
   final andamentoCtrl = TextEditingController();
   final faseCtrl = TextEditingController();
   final assuntoCtrl = TextEditingController();
@@ -35,18 +31,15 @@ class _CadProState extends State<CadPro> {
   final cpfCnpjCtrl = TextEditingController();
   final enderecoCtrl = TextEditingController();
   final advogadoCtrl = TextEditingController();
-  final numeroVaraCtrl = TextEditingController();
-
-<<<<<<< Updated upstream
-=======
   final oabCtrl = TextEditingController();
+
+  // Variáveis para dropdowns
   String? _selectedVara;
   String? _selectedTribunal;
   String? _selectedJuizado;
   String? _selectedAndamento;
   String? _selectedFase;
 
->>>>>>> Stashed changes
   // Máscaras
   final numeroProcessoFormatter = MaskTextInputFormatter(
     mask: '######-##.####.#.##.####',
@@ -70,8 +63,6 @@ class _CadProState extends State<CadPro> {
 
   String? fcmToken;
 
-<<<<<<< Updated upstream
-=======
   // Listas de opções
   final List<String> _varas = [
     'Vara Cível',
@@ -104,10 +95,9 @@ class _CadProState extends State<CadPro> {
     'Fase Instrutória',
     'Fase Decisória',
     'Fase Recursal',
-    'Fase Executiva ',
+    'Fase Executiva',
   ];
 
->>>>>>> Stashed changes
   @override
   void initState() {
     super.initState();
@@ -117,7 +107,6 @@ class _CadProState extends State<CadPro> {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-
     _initFCMToken();
   }
 
@@ -204,27 +193,19 @@ class _CadProState extends State<CadPro> {
                   .replaceAll(',', '.'),
             ) ??
             0.0,
-<<<<<<< Updated upstream
-        'vara': varaCtrl.text,
-        'tribunal': tribunalCtrl.text,
-        'juizado': juizadoCtrl.text,
-        'andamento': andamentoCtrl.text,
-        'fase_processual': faseCtrl.text,
-=======
         'numero_vara': numeroVaraCtrl.text,
         'vara': _selectedVara,
         'tribunal': _selectedTribunal,
         'juizado': _selectedJuizado,
         'andamento': _selectedAndamento,
         'fase_processual': _selectedFase,
->>>>>>> Stashed changes
         'assunto': assuntoCtrl.text,
         'historico': historicoCtrl.text,
         'partes': partes,
         'status': 'ativo',
         'usuarioId': FirebaseAuth.instance.currentUser!.uid,
-        'token': fcmToken, // 🟢 Token FCM do dispositivo
-        'notificado': false, // 🟢 flag para backend controlar notificações
+        'token': fcmToken,
+        'notificado': false,
       };
 
       // Salva no Firestore
@@ -249,88 +230,25 @@ class _CadProState extends State<CadPro> {
     numeroCtrl.clear();
     dataCtrl.clear();
     valorCtrl.clear();
-    varaCtrl.clear();
-    tribunalCtrl.clear();
-    juizadoCtrl.clear();
+    numeroVaraCtrl.clear();
     andamentoCtrl.clear();
     faseCtrl.clear();
     assuntoCtrl.clear();
+    historicoCtrl.clear();
     nomeParteCtrl.clear();
     cpfCnpjCtrl.clear();
     enderecoCtrl.clear();
     advogadoCtrl.clear();
     oabCtrl.clear();
-<<<<<<< Updated upstream
-    historicoCtrl.clear();
-  }
 
-  Widget _buildForm(
-    List<String> campos,
-    List<TextEditingController> controllers,
-    double largura, {
-    List<TextInputFormatter>? formatadores,
-    List<TextInputType>? teclados,
-  }) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: largura),
-        child: Column(
-          children: [
-            for (int i = 0; i < campos.length; i++) ...[
-              TextFormField(
-                controller: controllers[i],
-                inputFormatters:
-                    formatadores != null ? [formatadores[i]] : null,
-                keyboardType:
-                    teclados != null ? teclados[i] : TextInputType.text,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-                decoration: meuInputDecoration(campos[i]),
-                readOnly: campos[i] == "Data*",
-                onTap:
-                    campos[i] == "Data*"
-                        ? () => _selecionarData(context)
-                        : null,
-              ),
-              const SizedBox(height: 20),
-            ],
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 30),
-              child: SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: salvarNoFirestore,
-                  style: ElevatedButton.styleFrom(
-                    elevation: 4,
-                    shadowColor: const Color.fromARGB(255, 64, 27, 39),
-                    backgroundColor: const Color(0xff5E293B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                  ),
-                  child: const Text(
-                    "Salvar",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-=======
-    numeroVaraCtrl.clear();
-    _selectedVara = null;
-    _selectedTribunal = null;
-    _selectedJuizado = null;
-    _selectedAndamento = null;
-    _selectedFase = null;
+    setState(() {
+      _selectedVara = null;
+      _selectedTribunal = null;
+      _selectedJuizado = null;
+      _selectedAndamento = null;
+      _selectedFase = null;
+      _currentStep = 0;
+    });
   }
 
   Widget _buildDropdownField(
@@ -340,7 +258,14 @@ class _CadProState extends State<CadPro> {
     Function(String?) onChanged,
   ) {
     return GestureDetector(
-      onTap: () => _showDropdownModal(context, label, options, selectedValue, onChanged),
+      onTap:
+          () => _showDropdownModal(
+            context,
+            label,
+            options,
+            selectedValue,
+            onChanged,
+          ),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
@@ -354,19 +279,21 @@ class _CadProState extends State<CadPro> {
               child: Text(
                 selectedValue ?? label,
                 style: TextStyle(
-                  color: selectedValue != null 
-                      ? Colors.black87 
-                      : const Color.fromARGB(255, 132, 114, 102),
+                  color:
+                      selectedValue != null
+                          ? Colors.black87
+                          : const Color.fromARGB(255, 132, 114, 102),
                   fontSize: 16,
-                  fontWeight: selectedValue != null 
-                      ? FontWeight.normal 
-                      : FontWeight.bold,
+                  fontWeight:
+                      selectedValue != null
+                          ? FontWeight.normal
+                          : FontWeight.bold,
                 ),
               ),
             ),
-            Icon(
+            const Icon(
               Icons.keyboard_arrow_down,
-              color: const Color.fromARGB(255, 132, 114, 102),
+              color: Color.fromARGB(255, 132, 114, 102),
               size: 24,
             ),
           ],
@@ -430,7 +357,7 @@ class _CadProState extends State<CadPro> {
                   ],
                 ),
               ),
-              
+
               // Lista de opções
               ConstrainedBox(
                 constraints: BoxConstraints(
@@ -439,14 +366,13 @@ class _CadProState extends State<CadPro> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: options.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    color: Colors.grey.shade300,
-                  ),
+                  separatorBuilder:
+                      (context, index) =>
+                          Divider(height: 1, color: Colors.grey.shade300),
                   itemBuilder: (context, index) {
                     final option = options[index];
                     final isSelected = option == currentValue;
-                    
+
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -456,19 +382,22 @@ class _CadProState extends State<CadPro> {
                         option,
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected 
-                              ? const Color(0xFF490A1D) 
-                              : Colors.black87,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color:
+                              isSelected
+                                  ? const Color(0xFF490A1D)
+                                  : Colors.black87,
                         ),
                       ),
-                      trailing: isSelected
-                          ? const Icon(
-                              Icons.check_circle,
-                              color: Color(0xFF490A1D),
-                              size: 20,
-                            )
-                          : null,
+                      trailing:
+                          isSelected
+                              ? const Icon(
+                                Icons.check_circle,
+                                color: Color(0xFF490A1D),
+                                size: 20,
+                              )
+                              : null,
                       onTap: () {
                         onChanged(option);
                         Navigator.pop(context);
@@ -477,7 +406,7 @@ class _CadProState extends State<CadPro> {
                   },
                 ),
               ),
-              
+
               // Espaço inferior para o safe area
               SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
             ],
@@ -593,7 +522,6 @@ class _CadProState extends State<CadPro> {
     );
   }
 
-  // Progress Bar fixa melhorada
   Widget _buildFixedStepIndicator() {
     return Container(
       width: double.infinity,
@@ -621,7 +549,7 @@ class _CadProState extends State<CadPro> {
             ),
           ),
           const SizedBox(height: 10),
-          
+
           // Progress bar com círculos
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -636,46 +564,53 @@ class _CadProState extends State<CadPro> {
                     height: 32,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isActive
-                          ? const Color(0xFF490A1D)
-                          : isCompleted
+                      color:
+                          isActive
+                              ? const Color(0xFF490A1D)
+                              : isCompleted
                               ? const Color.fromARGB(255, 143, 23, 59)
                               : const Color(0xffE0D3CA),
                       border: Border.all(
-                        color: isActive || isCompleted
-                            ? const Color(0xFF490A1D)
-                            : Colors.grey.shade400,
+                        color:
+                            isActive || isCompleted
+                                ? const Color(0xFF490A1D)
+                                : Colors.grey.shade400,
                         width: 2,
                       ),
-                      boxShadow: isActive
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF490A1D).withOpacity(0.3),
-                                blurRadius: 6,
-                                spreadRadius: 1,
-                              ),
-                            ]
-                          : null,
+                      boxShadow:
+                          isActive
+                              ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF490A1D,
+                                  ).withOpacity(0.3),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                              : null,
                     ),
                     child: Center(
-                      child: isCompleted
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 16,
-                            )
-                          : Text(
-                              "${index + 1}",
-                              style: TextStyle(
-                                color: isActive
-                                    ? Colors.white
-                                    : isCompleted
-                                        ? Colors.white
-                                        : Colors.grey.shade600,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                      child:
+                          isCompleted
+                              ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                              : Text(
+                                "${index + 1}",
+                                style: TextStyle(
+                                  color:
+                                      isActive
+                                          ? Colors.white
+                                          : isCompleted
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
                     ),
                   ),
                   if (index != 2)
@@ -685,16 +620,17 @@ class _CadProState extends State<CadPro> {
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(2),
-                        color: index < _currentStep
-                            ? const Color(0xFF490A1D)
-                            : const Color(0xffE0D3CA),
+                        color:
+                            index < _currentStep
+                                ? const Color(0xFF490A1D)
+                                : const Color(0xffE0D3CA),
                       ),
                     ),
                 ],
               );
             }),
           ),
-          
+
           // Progress percentage
           const SizedBox(height: 8),
           Text(
@@ -706,87 +642,10 @@ class _CadProState extends State<CadPro> {
             ),
           ),
         ],
->>>>>>> Stashed changes
       ),
     );
   }
 
-<<<<<<< Updated upstream
-  Widget _buildInformacoesGerais(double largura) {
-    return _buildForm(
-      [
-        "Número*",
-        "Data*",
-        "Valor*",
-        "Vara*",
-        "Tribunal*",
-        "Juizado*",
-        "Andamento*",
-        "Fase Processual*",
-        "Assunto*",
-        "Historico*",
-      ],
-      [
-        numeroCtrl,
-        dataCtrl,
-        valorCtrl,
-        varaCtrl,
-        tribunalCtrl,
-        juizadoCtrl,
-        andamentoCtrl,
-        faseCtrl,
-        assuntoCtrl,
-        historicoCtrl,
-      ],
-      largura,
-      formatadores: [
-        numeroProcessoFormatter,
-        dataFormatter,
-        valorFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-      ],
-      teclados: [
-        TextInputType.number,
-        TextInputType.datetime,
-        TextInputType.number,
-        TextInputType.text,
-        TextInputType.text,
-        TextInputType.text,
-        TextInputType.text,
-        TextInputType.text,
-        TextInputType.text,
-        TextInputType.text,
-      ],
-    );
-  }
-
-  Widget _buildPartesEnvolvidas(double largura) {
-    return _buildForm(
-      ["Nome*", "CPF/CNPJ*", "Endereço*", "Advogado*", "OAB*"],
-      [nomeParteCtrl, cpfCnpjCtrl, enderecoCtrl, advogadoCtrl, oabCtrl],
-      largura,
-      formatadores: [
-        FilteringTextInputFormatter.singleLineFormatter,
-        cpfCnpjFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-        FilteringTextInputFormatter.singleLineFormatter,
-      ],
-      teclados: [
-        TextInputType.text,
-        TextInputType.number,
-        TextInputType.text,
-        TextInputType.text,
-        TextInputType.text,
-      ],
-    );
-=======
   String _getStepTitle(int step) {
     switch (step) {
       case 0:
@@ -842,97 +701,13 @@ class _CadProState extends State<CadPro> {
           ],
         );
     }
->>>>>>> Stashed changes
   }
 
   @override
   Widget build(BuildContext context) {
-    final double larguraTela = MediaQuery.of(context).size.width;
-    final double larguraMax = larguraTela > 600 ? 600.0 : larguraTela * 0.95;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-<<<<<<< Updated upstream
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          "Cadastro de Processo",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: Colors.black,
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(95),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12.0,
-              vertical: 10.0,
-            ),
-            child: Center(
-              child: IntrinsicWidth(
-                child: SegmentedButton<CadProcesso>(
-                  style: SegmentedButton.styleFrom(
-                    backgroundColor: const Color(0xffE0D3CA),
-                    foregroundColor: Colors.black,
-                    selectedForegroundColor: Colors.white,
-                    selectedBackgroundColor: const Color(0xff5E293B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  segments: const [
-                    ButtonSegment<CadProcesso>(
-                      value: CadProcesso.geral,
-                      label: Text(
-                        "Informações Gerais",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    ButtonSegment<CadProcesso>(
-                      value: CadProcesso.partes,
-                      label: Text(
-                        "Partes Envolvidas",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                  selected: <CadProcesso>{cadproView},
-                  onSelectionChanged: (Set<CadProcesso> newSelection) {
-                    setState(() {
-                      cadproView = newSelection.first;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: Column(
-                children: [
-                  if (cadproView == CadProcesso.geral)
-                    _buildInformacoesGerais(larguraMax),
-                  if (cadproView == CadProcesso.partes)
-                    _buildPartesEnvolvidas(larguraMax),
-                ],
-              ),
-            ),
-=======
         title: const Text("Cadastro de Processo"),
         centerTitle: true,
         backgroundColor: const Color(0xFF490A1D),
@@ -942,20 +717,17 @@ class _CadProState extends State<CadPro> {
         children: [
           // Progress bar fixa no topo
           _buildFixedStepIndicator(),
-          
+
           // Conteúdo do formulário
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
-                children: [
-                  _buildCurrentStep(),
-                  const SizedBox(height: 30),
-                ],
+                children: [_buildCurrentStep(), const SizedBox(height: 30)],
               ),
             ),
           ),
-          
+
           // Botões fixos na parte inferior
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -984,7 +756,10 @@ class _CadProState extends State<CadPro> {
                         elevation: 4,
                         shadowColor: const Color.fromARGB(255, 64, 27, 39),
                         backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFF490A1D), width: 2),
+                        side: const BorderSide(
+                          color: Color(0xFF490A1D),
+                          width: 2,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(9),
                         ),
@@ -1032,7 +807,6 @@ class _CadProState extends State<CadPro> {
                 ),
               ],
             ),
->>>>>>> Stashed changes
           ),
         ],
       ),
