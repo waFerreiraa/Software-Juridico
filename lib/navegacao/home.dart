@@ -138,6 +138,7 @@ class _HomePageState extends State<HomePage> {
       child: WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
+          backgroundColor: Colors.white,
           key: _scaffoldKey,
           endDrawer: Drawer(
             child: ListView(
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                 DrawerHeader(
                   decoration: BoxDecoration(
                     color:
-                        isDarkMode ? Colors.grey[800] : const Color(0xff5E293B),
+                        isDarkMode ? Colors.grey[800] : const Color(0xFF490A1D),
                   ),
                   child: Text(
                     'Menu',
@@ -327,25 +328,35 @@ class _HomePageState extends State<HomePage> {
               width < 800
                   ? Container(
                     margin: EdgeInsets.symmetric(
-                      horizontal: width * 0.02,
-                      vertical: height * 0.01,
+                      horizontal: width * 0.04,
+                      vertical: height * 0.02,
                     ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 1,
+                    ), // aumenta o espaço interno
                     decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 30,
-                          offset: Offset(2, height * 0.02),
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(25),
                       child: BottomNavigationBar(
                         currentIndex: myCurrentIndex,
-                        selectedFontSize: width * 0.04,
-                        showSelectedLabels: true,
-                        showUnselectedLabels: false,
+                        type: BottomNavigationBarType.fixed,
+                        backgroundColor: Colors.white,
+                        selectedItemColor: const Color(0xff5E293B),
+                        unselectedItemColor: Colors.black54,
+                        elevation: 0,
+                        selectedFontSize: width * 0.035,
+                        unselectedFontSize: width * 0.03,
+                        iconSize: 28, // deixa os ícones um pouco maiores
                         onTap: (index) {
                           if (index == 3) {
                             _scaffoldKey.currentState?.openEndDrawer();
@@ -355,6 +366,7 @@ class _HomePageState extends State<HomePage> {
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
+                            setState(() => myCurrentIndex = index);
                           }
                         },
                         items: const [

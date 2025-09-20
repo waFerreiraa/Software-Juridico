@@ -18,14 +18,17 @@ class _CasosAtivosState extends State<CasosAtivos> {
 
   Future<void> _excluirProcesso(String processoId) async {
     try {
-      await FirebaseFirestore.instance.collection('processos').doc(processoId).delete();
+      await FirebaseFirestore.instance
+          .collection('processos')
+          .doc(processoId)
+          .delete();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processo excluído com sucesso')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao excluir processo: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao excluir processo: $e')));
     }
   }
 
@@ -40,15 +43,16 @@ class _CasosAtivosState extends State<CasosAtivos> {
           'Casos Ativos',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
         ),
-        backgroundColor: const Color(0xff5E293B),
+        backgroundColor: const Color(0xFF490A1D),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('processos')
-            .where('usuarioId', isEqualTo: usuarioId)
-            .where('status', isEqualTo: 'ativo')
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('processos')
+                .where('usuarioId', isEqualTo: usuarioId)
+                .where('status', isEqualTo: 'ativo')
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -90,7 +94,9 @@ class _CasosAtivosState extends State<CasosAtivos> {
 
                   return Card(
                     margin: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 8),
+                      vertical: 10,
+                      horizontal: 8,
+                    ),
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -102,12 +108,14 @@ class _CasosAtivosState extends State<CasosAtivos> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DetalhesProcessoScreen(
-                              numero: processo['numero'] ?? 'N/A',
-                              nomeCliente: nomeCliente,
-                              historico: processo['historico'] ??
-                                  'Sem histórico disponível',
-                            ),
+                            builder:
+                                (context) => DetalhesProcessoScreen(
+                                  numero: processo['numero'] ?? 'N/A',
+                                  nomeCliente: nomeCliente,
+                                  historico:
+                                      processo['historico'] ??
+                                      'Sem histórico disponível',
+                                ),
                           ),
                         );
                       },
@@ -140,9 +148,10 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                   'Status: ${processo['status']}',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: processo['status'] == 'ativo'
-                                        ? Colors.green
-                                        : Colors.red,
+                                    color:
+                                        processo['status'] == 'ativo'
+                                            ? Colors.green
+                                            : Colors.red,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -150,53 +159,72 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                   children: [
                                     Icon(
                                       Icons.check_circle,
-                                      color: processo['status'] == 'ativo'
-                                          ? Colors.green
-                                          : Colors.red,
+                                      color:
+                                          processo['status'] == 'ativo'
+                                              ? Colors.green
+                                              : Colors.red,
                                       size: 28,
                                     ),
                                     const SizedBox(width: 16),
                                     IconButton(
-                                      icon:
-                                          const Icon(Icons.edit, color: Colors.blue),
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.blue,
+                                      ),
                                       tooltip: 'Editar processo',
                                       onPressed: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                EditarProcessoScreen(
-                                              processoId: processoId,
-                                            ),
+                                            builder:
+                                                (context) =>
+                                                    EditarProcessoScreen(
+                                                      processoId: processoId,
+                                                    ),
                                           ),
                                         );
                                       },
                                     ),
                                     IconButton(
-                                      icon:
-                                          const Icon(Icons.delete, color: Colors.red),
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
                                       tooltip: 'Excluir processo',
                                       onPressed: () async {
-                                        final confirmar = await showDialog<bool>(
+                                        final confirmar = await showDialog<
+                                          bool
+                                        >(
                                           context: context,
-                                          builder: (context) => AlertDialog(
-                                            title:
-                                                const Text('Confirmar exclusão'),
-                                            content: const Text(
-                                                'Tem certeza que deseja excluir este processo?'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(false),
-                                                child: const Text('Cancelar'),
+                                          builder:
+                                              (context) => AlertDialog(
+                                                title: const Text(
+                                                  'Confirmar exclusão',
+                                                ),
+                                                content: const Text(
+                                                  'Tem certeza que deseja excluir este processo?',
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed:
+                                                        () => Navigator.of(
+                                                          context,
+                                                        ).pop(false),
+                                                    child: const Text(
+                                                      'Cancelar',
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed:
+                                                        () => Navigator.of(
+                                                          context,
+                                                        ).pop(true),
+                                                    child: const Text(
+                                                      'Excluir',
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(true),
-                                                child: const Text('Excluir'),
-                                              ),
-                                            ],
-                                          ),
                                         );
 
                                         if (confirmar == true) {

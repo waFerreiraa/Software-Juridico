@@ -121,32 +121,28 @@ class _ResetPassState extends State<ResetPass> {
       setState(() => _carregando = true);
 
       final email = _emailController.text.trim();
-
       final erro = await _auten.resetarSenhaUsu(email: email);
 
       setState(() => _carregando = false);
 
-      if (erro != null) {
-        mostrarSnackBar(context: context, texto: erro);
-      } else {
-        mostrarSnackBar(
-          context: context,
-          texto:
-              "Um link para a redefinição de senha foi enviado para seu E-mail!",
-          backgroundColor: Colors.green,
-        );
+      // Mostra sempre verde
+      mostrarSnackBar(
+        context: context,
+        texto:
+            erro ??
+            "Um link para a redefinição de senha foi enviado para seu E-mail!",
+        backgroundColor: Colors.green, // 🔹 forçando verde
+      );
+
+      if (erro == null) {
         _formKey.currentState!.reset();
         _emailController.clear();
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
       }
     } else {
       mostrarSnackBar(
         context: context,
         texto: "Por favor, preencha todos os campos corretamente.",
+        backgroundColor: Colors.yellow, // 🔹 sempre verde
       );
     }
   }

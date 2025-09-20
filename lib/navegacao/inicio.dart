@@ -2,7 +2,6 @@
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-// import 'package:jurisolutions/models/google_login_service copy.dart';
 import 'package:jurisolutions/navegacao/cadastro.dart';
 import 'package:jurisolutions/navegacao/home.dart';
 import 'package:jurisolutions/navegacao/login.dart';
@@ -21,6 +20,7 @@ class _InicioTelaState extends State<InicioTela> {
     final isMobile = screenWidth < 800;
 
     return Scaffold(
+      backgroundColor: Colors.white, // 🌟 Fundo branco em todo o Scaffold
       body: isMobile ? _buildMobileLayout(context) : _buildWebLayout(context),
     );
   }
@@ -29,10 +29,10 @@ class _InicioTelaState extends State<InicioTela> {
   Widget _buildWebLayout(BuildContext context) {
     return Row(
       children: [
-        // Lado esquerdo com cor ou imagem
+        // Lado esquerdo (fundo branco)
         Expanded(
           child: Container(
-            color: const Color(0xFF5E293B),
+            color: Colors.white, // 🌟 agora é branco
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(40),
@@ -87,7 +87,21 @@ class _InicioTelaState extends State<InicioTela> {
               const SizedBox(height: 40),
               Image.asset('assets/Logoxs.png', height: 180),
               const SizedBox(height: 30),
-              _buildConteudo(context, isMobile: true),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: _buildConteudo(context, isMobile: true),
+              ),
               const SizedBox(height: 40),
             ],
           ),
@@ -180,19 +194,6 @@ class _InicioTelaState extends State<InicioTela> {
         const SizedBox(height: 25),
 
         // Texto "Ou faça login com Google"
-        Column(
-          children: [
-            const Text(
-              "Ou faça login com o Google",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
       ],
     );
   }

@@ -27,10 +27,10 @@ class _ProcessosPageState extends State<ProcessosPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
           "Processos e Casos",
@@ -62,7 +62,8 @@ class _ProcessosPageState extends State<ProcessosPage> {
                     const SizedBox(height: 50),
                     Text(
                       "Gerencie e organize seus projetos com facilidade.",
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      style: TextStyle(
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -71,7 +72,10 @@ class _ProcessosPageState extends State<ProcessosPage> {
                     Text(
                       "Tenha todos os casos do seu escritório em um só lugar!",
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 5),
 

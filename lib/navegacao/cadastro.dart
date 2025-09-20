@@ -60,7 +60,11 @@ class _CadastroPageState extends State<CadastroPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Cadastro")),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Cadastro"),
+        backgroundColor: Colors.white,
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
