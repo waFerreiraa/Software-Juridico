@@ -55,12 +55,10 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // ignore: avoid_print
       print('Permissão concedida para notificações');
     }
 
     String? token = await messaging.getToken();
-    // ignore: avoid_print
     print('Token FCM: $token');
     setState(() {
       _fcmToken = token;
@@ -118,6 +116,7 @@ class _HomePageState extends State<HomePage> {
         isDarkMode
             ? ThemeData.dark().copyWith(
               iconTheme: const IconThemeData(color: Color(0xFFE0D3CA)),
+              scaffoldBackgroundColor: Colors.black,
               bottomNavigationBarTheme: BottomNavigationBarThemeData(
                 selectedItemColor: const Color(0xFFE0D3CA),
                 unselectedItemColor: const Color(0xFFE0D3CA).withOpacity(0.5),
@@ -126,6 +125,7 @@ class _HomePageState extends State<HomePage> {
             )
             : ThemeData.light().copyWith(
               iconTheme: const IconThemeData(color: Colors.black),
+              scaffoldBackgroundColor: Colors.white,
               bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 selectedItemColor: Color(0xff5E293B),
                 unselectedItemColor: Colors.black,
@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> {
       child: WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.scaffoldBackgroundColor,
           key: _scaffoldKey,
           endDrawer: Drawer(
             child: ListView(
@@ -149,111 +149,61 @@ class _HomePageState extends State<HomePage> {
                     color:
                         isDarkMode ? Colors.grey[800] : const Color(0xFF490A1D),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Menu',
                     style: TextStyle(color: Colors.white, fontSize: 45),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(
-                    Icons.person,
-                    color: Theme.of(context).iconTheme.color,
+                  leading: Icon(Icons.person),
+                  title: Text("Perfil", style: TextStyle(fontSize: width * 0.045)),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Theme(data: theme, child: PerfilPage()),
+                    ),
                   ),
-                  title: Text(
-                    "Perfil",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
-                  onTap:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  Theme(data: theme, child: PerfilPage()),
-                        ),
-                      ),
                 ),
                 ListTile(
-                  leading: Icon(
-                    Icons.lock,
-                    color: Theme.of(context).iconTheme.color,
+                  leading: Icon(Icons.lock),
+                  title: Text("Resetar Senha", style: TextStyle(fontSize: width * 0.045)),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Theme(data: theme, child: ResetPass()),
+                    ),
                   ),
-                  title: Text(
-                    "Resetar Senha",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
-                  onTap:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  Theme(data: theme, child: ResetPass()),
-                        ),
-                      ),
                 ),
                 ListTile(
-                  leading: Icon(
-                    Icons.support_agent_rounded,
-                    color: Theme.of(context).iconTheme.color,
+                  leading: Icon(Icons.support_agent_rounded),
+                  title: Text("Suporte", style: TextStyle(fontSize: width * 0.045)),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Theme(data: theme, child: SuportePage()),
+                    ),
                   ),
-                  title: Text(
-                    "Suporte",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
-                  onTap:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  Theme(data: theme, child: SuportePage()),
-                        ),
-                      ),
                 ),
                 ListTile(
-                  leading: Icon(
-                    Icons.close_sharp,
-                    color: Theme.of(context).iconTheme.color,
+                  leading: Icon(Icons.close_sharp),
+                  title: Text("Casos Vencidos", style: TextStyle(fontSize: width * 0.045)),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Theme(data: theme, child: CasosVencidos()),
+                    ),
                   ),
-                  title: Text(
-                    "Casos Vencidos",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
-                  onTap:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  Theme(data: theme, child: CasosVencidos()),
-                        ),
-                      ),
                 ),
                 SwitchListTile(
-                  secondary: Icon(
-                    isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  title: Text(
-                    "Modo Noturno",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
+                  secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                  title: Text("Modo Noturno", style: TextStyle(fontSize: width * 0.045)),
                   value: isDarkMode,
                   onChanged: (value) => setState(() => isDarkMode = value),
                 ),
                 ListTile(
-                  leading: Icon(
-                    Icons.logout,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  title: Text(
-                    "Deslogar",
-                    style: TextStyle(fontSize: width * 0.045),
-                  ),
+                  leading: Icon(Icons.logout),
+                  title: Text("Deslogar", style: TextStyle(fontSize: width * 0.045)),
                   onTap: () async {
-                    await _loginService.signOut(); // <- Logout Google
+                    await _loginService.signOut();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder:
-                            (context) =>
-                                Theme(data: theme, child: InicioTela()),
+                        builder: (context) => Theme(data: theme, child: InicioTela()),
                       ),
                       (route) => false,
                     );
@@ -281,8 +231,7 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                     labelType: NavigationRailLabelType.selected,
-                    backgroundColor:
-                        theme.bottomNavigationBarTheme.backgroundColor,
+                    backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
                     selectedIconTheme: IconThemeData(
                       color: theme.bottomNavigationBarTheme.selectedItemColor,
                     ),
@@ -316,81 +265,77 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: PageView(
                     controller: _pageController,
-                    onPageChanged:
-                        (index) => setState(() => myCurrentIndex = index),
+                    onPageChanged: (index) => setState(() => myCurrentIndex = index),
                     children: pages,
                   ),
                 ),
               ],
             ),
           ),
-          bottomNavigationBar:
-              width < 800
-                  ? Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: width * 0.04,
-                      vertical: height * 0.02,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 1,
-                    ), // aumenta o espaço interno
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
+          bottomNavigationBar: width < 800
+              ? Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: width * 0.04,
+                    vertical: height * 0.02,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 1),
+                  decoration: BoxDecoration(
+                    color: theme.bottomNavigationBarTheme.backgroundColor,
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BottomNavigationBar(
+                      currentIndex: myCurrentIndex,
+                      type: BottomNavigationBarType.fixed,
+                      backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+                      selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor,
+                      unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor,
+                      elevation: 0,
+                      selectedFontSize: width * 0.035,
+                      unselectedFontSize: width * 0.03,
+                      iconSize: 28,
+                      onTap: (index) {
+                        if (index == 3) {
+                          _scaffoldKey.currentState?.openEndDrawer();
+                        } else {
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                          setState(() => myCurrentIndex = index);
+                        }
+                      },
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.folder_open),
+                          label: "Processos",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.calendar_month_outlined),
+                          label: "Agenda",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.notifications_active_outlined),
+                          label: "Notificação",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.menu),
+                          label: "Menu",
                         ),
                       ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: BottomNavigationBar(
-                        currentIndex: myCurrentIndex,
-                        type: BottomNavigationBarType.fixed,
-                        backgroundColor: Colors.white,
-                        selectedItemColor: const Color(0xff5E293B),
-                        unselectedItemColor: Colors.black54,
-                        elevation: 0,
-                        selectedFontSize: width * 0.035,
-                        unselectedFontSize: width * 0.03,
-                        iconSize: 28, // deixa os ícones um pouco maiores
-                        onTap: (index) {
-                          if (index == 3) {
-                            _scaffoldKey.currentState?.openEndDrawer();
-                          } else {
-                            _pageController.animateToPage(
-                              index,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                            setState(() => myCurrentIndex = index);
-                          }
-                        },
-                        items: const [
-                          BottomNavigationBarItem(
-                            icon: Icon(Icons.folder_open),
-                            label: "Processos",
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Icon(Icons.calendar_month_outlined),
-                            label: "Agenda",
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Icon(Icons.notifications_active_outlined),
-                            label: "Notificação",
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Icon(Icons.menu),
-                            label: "Menu",
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                  : null,
+                  ),
+                )
+              : null,
         ),
       ),
     );

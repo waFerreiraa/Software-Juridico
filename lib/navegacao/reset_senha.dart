@@ -14,39 +14,30 @@ class ResetPass extends StatefulWidget {
 
 class _ResetPassState extends State<ResetPass> {
   final _formKey = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
-
   final _auten = AutenticacaoServicos();
 
   InputDecoration meuInputDecoration(String label, IconData icon) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 13.0,
-        horizontal: 10.0,
-      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
       prefixIcon: Icon(icon),
       filled: true,
       fillColor: const Color(0xffE0D3CA),
       labelText: label,
       labelStyle: const TextStyle(
-        fontSize: 20, // tamanho quando dentro do input
+        fontSize: 20,
         color: Color.fromARGB(255, 132, 114, 102),
         fontWeight: FontWeight.bold,
       ),
       floatingLabelStyle: const TextStyle(
-        fontSize: 25, // tamanho quando sobe
-        color: Color(0xFF490A1D), // cor quando está focado
+        fontSize: 25,
+        color: Color(0xFF490A1D),
         fontWeight: FontWeight.w700,
       ),
-
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(
-          color: Color.fromARGB(255, 181, 164, 150),
-          width: 2,
-        ),
+        borderSide: const BorderSide(color: Color.fromARGB(255, 181, 164, 150), width: 2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -58,53 +49,58 @@ class _ResetPassState extends State<ResetPass> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Resetar Senha")),
+      appBar: AppBar(
+        title: const Text(
+          "Resetar Senha",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFF490A1D), // cor do topo
+        iconTheme: const IconThemeData(color: Colors.white), // botão voltar branco
+        elevation: 0,
+      ),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                Text(
+                const Text(
                   "Coloque seu e-mail, para poder resetar a sua senha.",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _emailController,
                   validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return "O e-mail não pode ser vazio.";
-                    }
+                    if (value?.isEmpty ?? true) return "O e-mail não pode ser vazio.";
                     if (!value!.contains("@")) return "E-mail inválido";
                     return null;
                   },
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   decoration: meuInputDecoration("E-mail", Icons.email),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: 400,
                   height: 55,
                   child: ElevatedButton(
                     onPressed: _carregando ? null : botaoPrincipalClicado,
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(10, 40),
+                      minimumSize: const Size(10, 40),
                       elevation: 4,
                       shadowColor: const Color.fromARGB(255, 79, 30, 46),
-                      backgroundColor: const Color(0xff5E293B),
+                      backgroundColor: const Color(0xFF490A1D),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(11),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       "Enviar",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
                 ),
@@ -125,13 +121,10 @@ class _ResetPassState extends State<ResetPass> {
 
       setState(() => _carregando = false);
 
-      // Mostra sempre verde
       mostrarSnackBar(
         context: context,
-        texto:
-            erro ??
-            "Um link para a redefinição de senha foi enviado para seu E-mail!",
-        backgroundColor: Colors.green, // 🔹 forçando verde
+        texto: erro ?? "Um link para a redefinição de senha foi enviado para seu E-mail!",
+        backgroundColor: Colors.green,
       );
 
       if (erro == null) {
@@ -142,7 +135,7 @@ class _ResetPassState extends State<ResetPass> {
       mostrarSnackBar(
         context: context,
         texto: "Por favor, preencha todos os campos corretamente.",
-        backgroundColor: Colors.yellow, // 🔹 sempre verde
+        backgroundColor: Colors.yellow,
       );
     }
   }

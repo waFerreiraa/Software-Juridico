@@ -4,6 +4,14 @@ import 'package:jurisolutions/models/google_login_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:googleapis/calendar/v3.dart' as cal;
 
+// An explicit enum for better state management
+enum AgendaState {
+  loading,
+  loginRequired,
+  eventsLoaded,
+  error,
+}
+
 class AgendaWidget extends StatefulWidget {
   final GoogleLoginService loginService;
   const AgendaWidget({super.key, required this.loginService});
@@ -17,9 +25,8 @@ class _AgendaWidgetState extends State<AgendaWidget> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  bool _isLoading = false;
-  bool _isLoadingEvents = false;
-  String _loadingMessage = 'Carregando...';
+  AgendaState _currentState = AgendaState.loading;
+  String _errorMessage = '';
 
   CalendarService? get _calendarService {
     final user = widget.loginService.currentUser;
@@ -29,92 +36,59 @@ class _AgendaWidgetState extends State<AgendaWidget> {
   @override
   void initState() {
     super.initState();
-    _initLogin();
+    _init();
   }
 
-  void _initLogin() async {
-    setState(() {
-      _isLoading = true;
-      _loadingMessage = 'Verificando login...';
-    });
-
+  Future<void> _init() async {
     try {
       await widget.loginService.signInSilently();
       if (widget.loginService.currentUser != null) {
-        setState(() {
-          _loadingMessage = 'Carregando eventos...';
-        });
-        await _carregarEventos();
+        await _loadEvents();
+      } else {
+        _updateState(AgendaState.loginRequired);
       }
-
-      widget.loginService.onCurrentUserChanged.listen((user) async {
-        if (user != null) {
-          setState(() {
-            _isLoading = true;
-            _loadingMessage = 'Carregando agenda...';
-          });
-          await _carregarEventos();
-          if (mounted) {
-            setState(() {
-              _isLoading = false;
-            });
-          }
-        } else {
-          // Limpar eventos quando usuário sair
-          _eventosNotifier.value = [];
-          if (mounted) {
-            setState(() {
-              _isLoading = false;
-            });
-          }
-        }
-      });
     } catch (e) {
-      print('Erro no login: $e');
-      if (mounted) {
-        setState(() {
-          _loadingMessage = 'Erro no login. Tente novamente.';
-        });
+      _handleError('Erro ao iniciar: $e');
+    }
+
+    widget.loginService.onCurrentUserChanged.listen((user) async {
+      if (user != null) {
+        await _loadEvents();
+      } else {
+        _eventosNotifier.value = [];
+        _updateState(AgendaState.loginRequired);
       }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    });
+  }
+
+  void _updateState(AgendaState newState, {String? message}) {
+    if (mounted) {
+      setState(() {
+        _currentState = newState;
+        if (message != null) _errorMessage = message;
+      });
     }
   }
 
-  Future<void> _carregarEventos() async {
-    if (_calendarService == null) return;
+  void _handleError(String message) {
+    print(message);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+    _updateState(AgendaState.error, message: message);
+  }
 
-    if (mounted) {
-      setState(() {
-        _isLoadingEvents = true;
-      });
-    }
-
+  Future<void> _loadEvents() async {
+    _updateState(AgendaState.loading);
     try {
       final eventos = await _calendarService!.listarEventos();
-      if (mounted) {
-        _eventosNotifier.value = eventos;
-      }
+      _eventosNotifier.value = eventos;
+      _updateState(AgendaState.eventsLoaded);
     } catch (e) {
-      print('Erro ao carregar eventos: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao carregar eventos: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingEvents = false;
-        });
-      }
+      _handleError('Erro ao carregar eventos: $e');
     }
   }
 
@@ -135,133 +109,112 @@ class _AgendaWidgetState extends State<AgendaWidget> {
 
     await showDialog(
       context: context,
-      builder:
-          (context) => StatefulBuilder(
-            builder:
-                (context, setStateDialog) => AlertDialog(
-                  title: const Text('Novo Evento'),
-                  content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: tituloController,
-                          decoration: const InputDecoration(
-                            labelText: 'Título',
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          child: Text(
-                            inicio == null
-                                ? 'Escolher Início'
-                                : 'Início: ${inicio!.day}/${inicio!.month} ${inicio!.hour}:${inicio!.minute.toString().padLeft(2, '0')}',
-                          ),
-                          onPressed: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: inicio ?? DateTime.now(),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2030),
-                            );
-                            if (date != null) {
-                              final time = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(
-                                  inicio ?? DateTime.now(),
-                                ),
-                              );
-                              if (time != null) {
-                                setStateDialog(() {
-                                  inicio = DateTime(
-                                    date.year,
-                                    date.month,
-                                    date.day,
-                                    time.hour,
-                                    time.minute,
-                                  );
-                                });
-                              }
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          child: Text(
-                            fim == null
-                                ? 'Escolher Fim'
-                                : 'Fim: ${fim!.day}/${fim!.month} ${fim!.hour}:${fim!.minute.toString().padLeft(2, '0')}',
-                          ),
-                          onPressed: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: fim ?? inicio ?? DateTime.now(),
-                              firstDate: inicio ?? DateTime.now(),
-                              lastDate: DateTime(2030),
-                            );
-                            if (date != null) {
-                              final time = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(
-                                  fim ?? inicio ?? DateTime.now(),
-                                ),
-                              );
-                              if (time != null) {
-                                setStateDialog(() {
-                                  fim = DateTime(
-                                    date.year,
-                                    date.month,
-                                    date.day,
-                                    time.hour,
-                                    time.minute,
-                                  );
-                                });
-                              }
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
+          title: Text('Novo Evento', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: tituloController,
+                  style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                  decoration: InputDecoration(
+                    labelText: 'Título',
+                    labelStyle: TextStyle(color: Theme.of(context).hintColor),
                   ),
-                  actions: [
-                    TextButton(
-                      child: const Text('Cancelar'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    ElevatedButton(
-                      child: const Text('Salvar'),
-                      onPressed: () async {
-                        if (tituloController.text.isNotEmpty &&
-                            inicio != null &&
-                            fim != null &&
-                            _calendarService != null) {
-                          try {
-                            await _calendarService!.criarEvento(
-                              inicio!,
-                              fim!,
-                              tituloController.text,
-                            );
-                            await _carregarEventos();
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                            }
-                          } catch (e) {
-                            print('Erro ao criar evento: $e');
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Erro ao criar evento: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        }
-                      },
-                    ),
-                  ],
                 ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  child: Text(
+                    inicio == null
+                        ? 'Escolher Início'
+                        : 'Início: ${inicio!.day}/${inicio!.month} ${inicio!.hour}:${inicio!.minute.toString().padLeft(2, '0')}',
+                  ),
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: inicio ?? DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030),
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context),
+                        child: child!,
+                      ),
+                    );
+                    if (date != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(inicio ?? DateTime.now()),
+                      );
+                      if (time != null) {
+                        setStateDialog(() {
+                          inicio = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                        });
+                      }
+                    }
+                  },
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  child: Text(
+                    fim == null
+                        ? 'Escolher Fim'
+                        : 'Fim: ${fim!.day}/${fim!.month} ${fim!.hour}:${fim!.minute.toString().padLeft(2, '0')}',
+                  ),
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: fim ?? inicio ?? DateTime.now(),
+                      firstDate: inicio ?? DateTime.now(),
+                      lastDate: DateTime(2030),
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context),
+                        child: child!,
+                      ),
+                    );
+                    if (date != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(fim ?? inicio ?? DateTime.now()),
+                      );
+                      if (time != null) {
+                        setStateDialog(() {
+                          fim = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                        });
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              child: Text('Cancelar', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
+              onPressed: () => Navigator.pop(context),
+            ),
+            ElevatedButton(
+              child: const Text('Salvar'),
+              onPressed: () async {
+                if (tituloController.text.isNotEmpty &&
+                    inicio != null &&
+                    fim != null &&
+                    _calendarService != null) {
+                  try {
+                    await _calendarService!.criarEvento(inicio!, fim!, tituloController.text);
+                    if (context.mounted) Navigator.pop(context);
+                    await _loadEvents();
+                  } catch (e) {
+                    _handleError('Erro ao criar evento: $e');
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -270,356 +223,292 @@ class _AgendaWidgetState extends State<AgendaWidget> {
 
     try {
       await _calendarService!.deletarEvento(evento);
-      await _carregarEventos();
+      await _loadEvents();
     } catch (e) {
-      print('Erro ao deletar evento: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao deletar evento: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _handleError('Erro ao deletar evento: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = widget.loginService.currentUser;
+    switch (_currentState) {
+      case AgendaState.loading:
+        return _buildLoadingView();
+      case AgendaState.loginRequired:
+        return _buildLoginView();
+      case AgendaState.eventsLoaded:
+      case AgendaState.error:
+        return _buildAgendaView();
+    }
+  }
 
-    // Mostrar loading se estiver carregando
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF490A1D)),
+  Widget _buildLoadingView() {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF490A1D)),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Carregando...',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
-              const SizedBox(height: 20),
-              Text(
-                _loadingMessage,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Isso pode levar alguns segundos...',
+              style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginView() {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: _LoginView(
+        loginService: widget.loginService,
+        onLogin: _loadEvents,
+      ),
+    );
+  }
+
+  Widget _buildAgendaView() {
+    final user = widget.loginService.currentUser;
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              if (user != null)
+                UserHeader(
+                  user: user,
+                  onSignOut: () async {
+                    await widget.loginService.signOut();
+                  },
+                ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _abrirDialogoNovoEvento,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(10, 45),
+                  elevation: 2,
+                  shadowColor: const Color.fromARGB(255, 64, 27, 39),
+                  backgroundColor: const Color(0xFF490A1D),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Text(
+                  'Criar novo evento',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'Isso pode levar alguns segundos...',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2020, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: _focusedDay,
+                        calendarFormat: _calendarFormat,
+                        selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
+                        onDaySelected: (selectedDay, focusedDay) {
+                          setState(() {
+                            _selectedDay = selectedDay;
+                            _focusedDay = focusedDay;
+                          });
+                        },
+                        onFormatChanged: (format) {
+                          setState(() {
+                            _calendarFormat = format;
+                          });
+                        },
+                        eventLoader: _eventosDoDia,
+                        calendarStyle: CalendarStyle(
+                          todayDecoration: BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                          selectedDecoration: BoxDecoration(
+                            color: Colors.orange,
+                            shape: BoxShape.circle,
+                          ),
+                          outsideDaysVisible: true,
+                          defaultTextStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                          weekendTextStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                        ),
+                        headerStyle: const HeaderStyle(
+                          formatButtonVisible: true,
+                          titleCentered: true,
+                        ),
+                        locale: 'pt_BR',
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: _buildEventList(),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child:
-            user == null
-                ? _LoginView(
-                  loginService: widget.loginService,
-                  onLogin: _carregarEventos,
-                )
-                : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      UserHeader(
-                        user: user,
-                        onSignOut: () async {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await widget.loginService.signOut();
-                          _eventosNotifier.value = [];
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: _abrirDialogoNovoEvento,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(10, 45),
-                          elevation: 2,
-                          shadowColor: const Color.fromARGB(255, 64, 27, 39),
-                          backgroundColor: const Color(0xFF490A1D),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Text(
-                          'Criar novo evento',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: TableCalendar(
-                                firstDay: DateTime.utc(2020, 1, 1),
-                                lastDay: DateTime.utc(2030, 12, 31),
-                                focusedDay: _focusedDay,
-                                calendarFormat: _calendarFormat,
-                                selectedDayPredicate:
-                                    (day) => isSameDay(day, _selectedDay),
-                                onDaySelected: (selectedDay, focusedDay) {
-                                  setState(() {
-                                    _selectedDay = selectedDay;
-                                    _focusedDay = focusedDay;
-                                  });
-                                },
-                                onFormatChanged: (format) {
-                                  setState(() {
-                                    _calendarFormat = format;
-                                  });
-                                },
-                                eventLoader: _eventosDoDia,
-                                calendarStyle: const CalendarStyle(
-                                  todayDecoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  selectedDecoration: BoxDecoration(
-                                    color: Colors.orange,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  outsideDaysVisible: true,
-                                ),
-                                headerStyle: const HeaderStyle(
-                                  formatButtonVisible: true,
-                                  titleCentered: true,
-                                ),
-                                locale: 'pt_BR',
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child:
-                                    _isLoadingEvents
-                                        ? const Center(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              CircularProgressIndicator(),
-                                              SizedBox(height: 16),
-                                              Text(
-                                                'Carregando eventos...',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                        : ValueListenableBuilder<
-                                          List<cal.Event>
-                                        >(
-                                          valueListenable: _eventosNotifier,
-                                          builder: (context, eventos, _) {
-                                            final eventosDia =
-                                                _selectedDay == null
-                                                    ? []
-                                                    : _eventosDoDia(
-                                                      _selectedDay!,
-                                                    );
-
-                                            if (_selectedDay == null) {
-                                              return const Center(
-                                                child: Text(
-                                                  'Selecione um dia para ver os eventos',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-
-                                            if (eventosDia.isEmpty) {
-                                              return Center(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.event_busy,
-                                                      size: 64,
-                                                      color: Colors.grey[400],
-                                                    ),
-                                                    const SizedBox(height: 16),
-                                                    Text(
-                                                      'Nenhum evento neste dia',
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.grey[600],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }
-
-                                            return RefreshIndicator(
-                                              onRefresh: _carregarEventos,
-                                              child: ListView.builder(
-                                                padding: const EdgeInsets.all(
-                                                  8,
-                                                ),
-                                                itemCount: eventosDia.length,
-                                                itemBuilder: (context, index) {
-                                                  final e = eventosDia[index];
-                                                  final start =
-                                                      e.start?.dateTime ??
-                                                      e.start?.date ??
-                                                      DateTime.now();
-                                                  final end =
-                                                      e.end?.dateTime ??
-                                                      e.end?.date ??
-                                                      DateTime.now();
-
-                                                  return Card(
-                                                    color:
-                                                        Colors.deepPurple[400],
-                                                    margin:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 4,
-                                                          vertical: 6,
-                                                        ),
-                                                    elevation: 2,
-                                                    child: ListTile(
-                                                      title: Text(
-                                                        e.summary ??
-                                                            'Sem título',
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      subtitle: Text(
-                                                        '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')} - '
-                                                        '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}',
-                                                        style: const TextStyle(
-                                                          color: Colors.white70,
-                                                        ),
-                                                      ),
-                                                      trailing: IconButton(
-                                                        icon: const Icon(
-                                                          Icons.delete,
-                                                          color:
-                                                              Colors.redAccent,
-                                                        ),
-                                                        onPressed: () async {
-                                                          final confirma = await showDialog<
-                                                            bool
-                                                          >(
-                                                            context: context,
-                                                            builder:
-                                                                (
-                                                                  context,
-                                                                ) => AlertDialog(
-                                                                  title: const Text(
-                                                                    'Confirmar exclusão',
-                                                                  ),
-                                                                  content: Text(
-                                                                    'Deseja realmente deletar o evento "${e.summary}"?',
-                                                                  ),
-                                                                  actions: [
-                                                                    TextButton(
-                                                                      onPressed:
-                                                                          () => Navigator.pop(
-                                                                            context,
-                                                                            false,
-                                                                          ),
-                                                                      child: const Text(
-                                                                        'Cancelar',
-                                                                      ),
-                                                                    ),
-                                                                    ElevatedButton(
-                                                                      style: ElevatedButton.styleFrom(
-                                                                        backgroundColor:
-                                                                            Colors.red,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () => Navigator.pop(
-                                                                            context,
-                                                                            true,
-                                                                          ),
-                                                                      child: const Text(
-                                                                        'Deletar',
-                                                                        style: TextStyle(
-                                                                          color:
-                                                                              Colors.white,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                          );
-                                                          if (confirma ==
-                                                              true) {
-                                                            await _deletarEvento(
-                                                              e,
-                                                            );
-                                                          }
-                                                        },
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+  Widget _buildEventList() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).canvasColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ValueListenableBuilder<List<cal.Event>>(
+        valueListenable: _eventosNotifier,
+        builder: (context, eventos, _) {
+          if (_selectedDay == null) {
+            return Center(
+              child: Text(
+                'Selecione um dia para ver os eventos',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).hintColor,
                 ),
+              ),
+            );
+          }
+
+          final eventosDia = _eventosDoDia(_selectedDay!);
+          if (eventosDia.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.event_busy,
+                    size: 64,
+                    color: Theme.of(context).hintColor,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Nenhum evento neste dia',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).hintColor,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: _loadEvents,
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: eventosDia.length,
+              itemBuilder: (context, index) {
+                final e = eventosDia[index];
+                final start = e.start?.dateTime ?? e.start?.date ?? DateTime.now();
+                final end = e.end?.dateTime ?? e.end?.date ?? DateTime.now();
+
+                return Card(
+                  color: Colors.deepPurple[400],
+                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  elevation: 2,
+                  child: ListTile(
+                    title: Text(
+                      e.summary ?? 'Sem título',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')} - '
+                      '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.redAccent,
+                      ),
+                      onPressed: () async {
+                        final confirma = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Theme.of(context).cardColor,
+                            title: Text('Confirmar exclusão', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                            content: Text(
+                              'Deseja realmente deletar o evento "${e.summary}"?',
+                              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text('Cancelar', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text(
+                                  'Deletar',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirma == true) {
+                          await _deletarEvento(e);
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-// =================== COMPONENTES ===================
 
 class _LoginView extends StatelessWidget {
   final GoogleLoginService loginService;
@@ -633,30 +522,27 @@ class _LoginView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.calendar_today, size: 120, color: const Color(0xFF490A1D)),
+          Icon(Icons.calendar_today, size: 120, color: Color(0xFF490A1D)),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Para acessar sua agenda e receber notificações, faça login com sua conta Google.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () async {
               try {
-                // Mostrar loading durante o login
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Row(
                       children: [
                         CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                         SizedBox(width: 16),
                         Text('Fazendo login...'),
@@ -669,7 +555,6 @@ class _LoginView extends StatelessWidget {
 
                 await loginService.signIn();
 
-                // Remover snackbar de loading
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
                 onLogin();
@@ -687,17 +572,12 @@ class _LoginView extends StatelessWidget {
             icon: const Icon(Icons.login, color: Colors.white),
             label: const Text(
               'Login com Google',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
               backgroundColor: const Color(0xFF490A1D),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 4,
             ),
           ),
@@ -715,48 +595,40 @@ class UserHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white, // 🌟 Define fundo branco
+      color: Theme.of(context).cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
-            user.photoUrl != null
-                ? CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(user.photoUrl!),
-                )
-                : const CircleAvatar(radius: 20, child: Icon(Icons.person)),
+            CircleAvatar(
+              backgroundImage: NetworkImage(user.photoUrl ?? ''),
+              backgroundColor: Colors.grey[200],
+            ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                user.email ?? 'Usuário',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.displayName ?? 'Usuário',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
+                  ),
+                  Text(
+                    user.email ?? '',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                ],
               ),
             ),
-            ElevatedButton(
+            IconButton(
+              icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.primary),
               onPressed: onSignOut,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(10, 35),
-                elevation: 2,
-                shadowColor: const Color.fromARGB(255, 64, 27, 39),
-                backgroundColor: const Color(0xFF490A1D),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text(
-                'Sair',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
             ),
           ],
         ),

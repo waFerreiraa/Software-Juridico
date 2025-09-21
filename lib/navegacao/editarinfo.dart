@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,22 +52,26 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
 
     // Verifica se o processo pertence ao usuário logado
     if (processoData['usuarioId'] == usuarioId) {
-      setState(() {
-        numeroController.text = processoData['numero'];
-        varaController.text = processoData['vara'];
-        tribunalController.text = processoData['tribunal'];
-        andamentoController.text = processoData['andamento'];
-        faseController.text = processoData['fase_processual'];
-        assuntoController.text = processoData['assunto'];
-      });
+      if (mounted) {
+        setState(() {
+          numeroController.text = processoData['numero'];
+          varaController.text = processoData['vara'];
+          tribunalController.text = processoData['tribunal'];
+          andamentoController.text = processoData['andamento'];
+          faseController.text = processoData['fase_processual'];
+          assuntoController.text = processoData['assunto'];
+        });
+      }
     } else {
       // Caso o processo não pertença ao usuário logado, exibe um erro
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Você não tem permissão para editar este processo.'),
-        ),
-      );
-      Navigator.pop(context); // Retorna à tela anterior
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Você não tem permissão para editar este processo.'),
+          ),
+        );
+        Navigator.pop(context); // Retorna à tela anterior
+      }
     }
   }
 
@@ -76,16 +81,18 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
           .collection('processos')
           .doc(widget.processoId)
           .update({
-            'numero': numeroController.text,
-            'vara': varaController.text,
-            'tribunal': tribunalController.text,
-            'andamento': andamentoController.text,
-            'fase_processual': faseController.text,
-            'assunto': assuntoController.text,
-          });
+        'numero': numeroController.text,
+        'vara': varaController.text,
+        'tribunal': tribunalController.text,
+        'andamento': andamentoController.text,
+        'fase_processual': faseController.text,
+        'assunto': assuntoController.text,
+      });
 
       // Volta para a tela de Casos Ativos
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -93,8 +100,12 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar Processo'),
-        backgroundColor: const Color(0xff5E293B),
+        title: const Text(
+          'Editar Processo',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF490A1D),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -131,6 +142,7 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
                       return 'Campo obrigatório';
                     }
                     return null;
+                    
                   },
                 ),
                 TextFormField(

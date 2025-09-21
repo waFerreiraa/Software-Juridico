@@ -27,10 +27,10 @@ class _ProcessosPageState extends State<ProcessosPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         title: Text(
           "Processos e Casos",
@@ -38,7 +38,6 @@ class _ProcessosPageState extends State<ProcessosPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        // Removidos os IconButton
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -65,6 +64,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        color: theme.textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -75,103 +75,103 @@ class _ProcessosPageState extends State<ProcessosPage> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
+                        color: theme.textTheme.bodyMedium?.color,
                       ),
                     ),
                     const SizedBox(height: 5),
-
                     const SizedBox(height: 50),
                     isDesktop
                         ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: _infoCard(
-                                context: context,
-                                title: "Com o número do CNJ",
-                                description:
-                                    "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: _infoCard(
+                                  context: context,
+                                  title: "Com o número do CNJ",
+                                  description:
+                                      "Realize a busca individual de processos de primeira instância pelo número CNJ. Ideal para cadastrar um único processo.",
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: _infoCard(
-                                context: context,
-                                title: "Cadastro em lote com número OAB",
-                                description:
-                                    "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: _infoCard(
+                                  context: context,
+                                  title: "Cadastro em lote com número OAB",
+                                  description:
+                                      "Registre facilmente seus processos ativos vinculados ao OAB do advogado. A forma mais prática de gerenciar seus casos!",
+                                ),
                               ),
-                            ),
-                          ],
-                        )
+                            ],
+                          )
                         : Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CadPro(),
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // ALTERAÇÃO FEITA AQUI
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Theme(
+                                        data: theme,
+                                        child: const CadPro(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(320, 48),
+                                  elevation: 4,
+                                  shadowColor:
+                                      const Color.fromARGB(255, 74, 43, 53),
+                                  backgroundColor: const Color(0xFF490A1D),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9),
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(320, 48),
-                                elevation: 4,
-                                shadowColor: const Color.fromARGB(
-                                  255,
-                                  74,
-                                  43,
-                                  53,
                                 ),
-                                backgroundColor: const Color(0xFF490A1D),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(9),
-                                ),
-                              ),
-                              child: Text(
-                                "Adicionar Processo",
-                                style: TextStyle(
-                                  fontSize: 19,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CasosAtivos(),
+                                child: const Text(
+                                  "Adicionar Processo",
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(320, 48),
-                                elevation: 4,
-                                shadowColor: const Color.fromARGB(
-                                  255,
-                                  74,
-                                  43,
-                                  53,
-                                ),
-                                backgroundColor: const Color(0xFF490A1D),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(9),
                                 ),
                               ),
-                              child: Text(
-                                "Casos Ativos",
-                                style: TextStyle(
-                                  fontSize: 19,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                              const SizedBox(height: 15),
+                              ElevatedButton(
+                                onPressed: () {
+                                  
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Theme(
+                                        data: theme,
+                                        child: const CasosAtivos(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(320, 48),
+                                  elevation: 4,
+                                  shadowColor:
+                                      const Color.fromARGB(255, 74, 43, 53),
+                                  backgroundColor: const Color(0xFF490A1D),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Casos Ativos",
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                   ],
                 ),
               ),
@@ -188,7 +188,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
     required String description,
   }) {
     final theme = Theme.of(context);
-    final cardColor = const Color(0xffE0D3CA);
+    final cardColor = theme.cardColor;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -210,7 +210,7 @@ class _ProcessosPageState extends State<ProcessosPage> {
           const SizedBox(height: 8),
           Text(
             description,
-            style: theme.textTheme.bodySmall?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),

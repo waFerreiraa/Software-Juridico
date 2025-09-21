@@ -19,9 +19,18 @@ class _CasosVencidosState extends State<CasosVencidos> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Casos Vencidos'),
-        backgroundColor: const Color(0xff5E293B),
+        title: const Text(
+        'Casos Vencidos',
+          style: TextStyle(
+          color: Colors.white, // título em branco
+          fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFF490A1D), // fundo na cor do app
+        iconTheme: const IconThemeData(color: Colors.white), // botão voltar em branco
+        elevation: 0,
       ),
+
       body: StreamBuilder<QuerySnapshot>(
         stream:
             FirebaseFirestore.instance
