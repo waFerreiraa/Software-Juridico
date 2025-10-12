@@ -237,7 +237,7 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                                 onPressed: () =>
                                                     Navigator.of(context)
                                                         .pop(true),
-                                                child: const Text('Excluir'),
+                                                child: const Text('Excluir'),//texto para teste
                                               ),
                                             ],
                                           ),
