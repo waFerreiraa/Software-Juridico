@@ -15,23 +15,21 @@ class DetalhesProcessoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pegando as cores do tema atual
+    // Pegando o tema atual para cores do corpo da tela
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
-    // Define a cor de fundo do AppBar com base no tema
-    final appBarColor = isDarkMode ? theme.cardColor : const Color(0xFF490A1D);
-    
-    // Define a cor do texto do AppBar com base no tema
-    final appBarTextColor = isDarkMode ? Colors.white : Colors.white;
 
-    // Define a cor do texto do corpo da tela com base no tema
+    // Cores fixas do AppBar
+    final Color appBarColor = const Color(0xFF490A1D); // fixa
+    const Color appBarTextColor = Colors.white; // fixa
+
+    // Cores do corpo da tela (respeitando modo escuro)
     final bodyTextColor = isDarkMode ? Colors.white70 : Colors.black87;
     final bodyTextBoldColor = isDarkMode ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Detalhes do Processo',
           style: TextStyle(color: appBarTextColor),
         ),

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:jurisolutions/navegacao/Vizualizar.dart';
+import 'package:jurisolutions/navegacao/Vizualizar.dart'; 
 import 'package:jurisolutions/navegacao/editarinfo.dart';
 
 class CasosAtivos extends StatefulWidget {
@@ -26,33 +26,44 @@ class _CasosAtivosState extends State<CasosAtivos> {
         const SnackBar(content: Text('Processo excluído com sucesso')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao excluir processo: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir processo: $e')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Pega o tema atual
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     final double larguraTela = MediaQuery.of(context).size.width;
     final double larguraMax = larguraTela > 700 ? 700.0 : larguraTela * 0.95;
+
+    // Cores fixas do AppBar
+    final Color appBarBgColor = const Color(0xFF490A1D); // fixa
+    const Color appBarFgColor = Colors.white; 
+
+    // Cores do restante do app (modo escuro funciona)
+    final Color defaultTextColor = isDarkMode ? Colors.white70 : Colors.black87;
+    final Color defaultTextBoldColor = isDarkMode ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Casos Ativos',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          style: TextStyle(color: appBarFgColor, fontWeight: FontWeight.w500),
         ),
-        backgroundColor: const Color(0xFF490A1D),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: appBarBgColor,
+        iconTheme: const IconThemeData(color: appBarFgColor),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('processos')
-                .where('usuarioId', isEqualTo: usuarioId)
-                .where('status', isEqualTo: 'ativo')
-                .snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('processos')
+            .where('usuarioId', isEqualTo: usuarioId)
+            .where('status', isEqualTo: 'ativo')
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -63,7 +74,12 @@ class _CasosAtivosState extends State<CasosAtivos> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Nenhum processo ativo.'));
+            return Center(
+              child: Text(
+                'Nenhum processo ativo.',
+                style: TextStyle(color: defaultTextColor),
+              ),
+            );
           }
 
           final processosAtivos = snapshot.data!.docs;
@@ -79,7 +95,6 @@ class _CasosAtivosState extends State<CasosAtivos> {
                       processosAtivos[index].data() as Map<String, dynamic>;
                   final processoId = processosAtivos[index].id;
 
-                  // Extrair nome do cliente dentro da lista 'partes'
                   String nomeCliente = 'Não informado';
                   if (processo['partes'] != null &&
                       processo['partes'] is List &&
@@ -104,18 +119,20 @@ class _CasosAtivosState extends State<CasosAtivos> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        // Navegar para a tela de detalhes, passando os dados
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => DetalhesProcessoScreen(
+                            builder: (context) {
+                              return Theme(
+                                data: theme,
+                                child: DetalhesProcessoScreen(
                                   numero: processo['numero'] ?? 'N/A',
                                   nomeCliente: nomeCliente,
-                                  historico:
-                                      processo['historico'] ??
+                                  historico: processo['historico'] ??
                                       'Sem histórico disponível',
                                 ),
+                              );
+                            },
                           ),
                         );
                       },
@@ -126,19 +143,22 @@ class _CasosAtivosState extends State<CasosAtivos> {
                           children: [
                             Text(
                               'Número: ${processo['numero'] ?? "N/A"}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: defaultTextBoldColor,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Cliente: $nomeCliente',
-                              style: const TextStyle(fontSize: 16),
+                              style: TextStyle(
+                                  fontSize: 16, color: defaultTextColor),
                             ),
                             Text(
                               'Histórico: ${processo['historico'] ?? "Sem histórico"}',
-                              style: const TextStyle(fontSize: 16),
+                              style: TextStyle(
+                                  fontSize: 16, color: defaultTextColor),
                             ),
                             const SizedBox(height: 8),
                             Row(
@@ -148,10 +168,9 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                   'Status: ${processo['status']}',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color:
-                                        processo['status'] == 'ativo'
-                                            ? Colors.green
-                                            : Colors.red,
+                                    color: processo['status'] == 'ativo'
+                                        ? Colors.green
+                                        : Colors.red,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -159,28 +178,30 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                   children: [
                                     Icon(
                                       Icons.check_circle,
-                                      color:
-                                          processo['status'] == 'ativo'
-                                              ? Colors.green
-                                              : Colors.red,
+                                      color: processo['status'] == 'ativo'
+                                          ? Colors.green
+                                          : Colors.red,
                                       size: 28,
                                     ),
                                     const SizedBox(width: 16),
                                     IconButton(
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.edit,
-                                        color: Colors.blue,
+                                        color: theme.colorScheme.secondary,
                                       ),
                                       tooltip: 'Editar processo',
                                       onPressed: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder:
-                                                (context) =>
-                                                    EditarProcessoScreen(
-                                                      processoId: processoId,
-                                                    ),
+                                            builder: (context) {
+                                              return Theme(
+                                                data: theme,
+                                                child: EditarProcessoScreen(
+                                                  processoId: processoId,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         );
                                       },
@@ -192,39 +213,34 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                       ),
                                       tooltip: 'Excluir processo',
                                       onPressed: () async {
-                                        final confirmar = await showDialog<
-                                          bool
-                                        >(
+                                        final confirmar = await showDialog<bool>(
                                           context: context,
-                                          builder:
-                                              (context) => AlertDialog(
-                                                title: const Text(
-                                                  'Confirmar exclusão',
-                                                ),
-                                                content: const Text(
-                                                  'Tem certeza que deseja excluir este processo?',
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed:
-                                                        () => Navigator.of(
-                                                          context,
-                                                        ).pop(false),
-                                                    child: const Text(
-                                                      'Cancelar',
-                                                    ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed:
-                                                        () => Navigator.of(
-                                                          context,
-                                                        ).pop(true),
-                                                    child: const Text(
-                                                      'Excluir',
-                                                    ),
-                                                  ),
-                                                ],
+                                          builder: (context) => AlertDialog(
+                                            title: Text(
+                                              'Confirmar exclusão',
+                                              style: TextStyle(
+                                                  color: defaultTextBoldColor),
+                                            ),
+                                            content: Text(
+                                              'Tem certeza que deseja excluir este processo?',
+                                              style: TextStyle(
+                                                  color: defaultTextColor),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context)
+                                                        .pop(false),
+                                                child: const Text('Cancelar'),
                                               ),
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context)
+                                                        .pop(true),
+                                                child: const Text('Excluir'),
+                                              ),
+                                            ],
+                                          ),
                                         );
 
                                         if (confirmar == true) {

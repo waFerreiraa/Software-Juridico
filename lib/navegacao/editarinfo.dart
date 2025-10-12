@@ -181,7 +181,7 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
                 ElevatedButton(
                   onPressed: _salvarProcesso,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff5E293B),
+                    backgroundColor: const Color(0xFF490A1D),
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
