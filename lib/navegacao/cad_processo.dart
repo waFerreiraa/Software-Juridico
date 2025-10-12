@@ -705,14 +705,14 @@ class _CadProState extends State<CadPro> {
       appBar: AppBar(
         title: const Text("Cadastro de Processo"),
         centerTitle: true,
-        // Removidos os atributos de cor, eles serão definidos pelo tema.
+        
       ),
       body: Column(
         children: [
-          // Progress bar fixa no topo
+          
           _buildFixedStepIndicator(),
 
-          // Conteúdo do formulário
+          
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
