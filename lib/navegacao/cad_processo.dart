@@ -56,9 +56,11 @@ class _CadProState extends State<CadPro> {
     filter: {"#": RegExp(r'[0-9]')},
   );
 
-  final valorFormatter = CurrencyInputFormatter(
+  final valorFormatter = MoneyInputFormatter(
     leadingSymbol: 'R\$',
     useSymbolPadding: true,
+    thousandSeparator: ThousandSeparator.Period, // separador de milhar
+    mantissaLength: 2, // número de casas decimais
   );
 
   String? fcmToken;
@@ -443,7 +445,7 @@ class _CadProState extends State<CadPro> {
               child: TextFormField(
                 controller: numeroVaraCtrl,
                 decoration: meuInputDecoration("Nº"),
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.number,
               ),
             ),
             const SizedBox(width: 12),
