@@ -31,19 +31,35 @@ class _HomePageState extends State<HomePage> {
   bool isDarkMode = false;
   String? _fcmToken;
 
+  // NOVO — Nome do usuário
+  String? nomeUsuario;
+
   // Serviço de login Google
   final GoogleLoginService _loginService = GoogleLoginService();
 
   @override
   void initState() {
     super.initState();
+
+    // CARREGAR NOME DO USUÁRIO
+    _carregarNomeUsuario();
+
     pages = [
       ProcessosPage(),
-      AgendaWidget(loginService: _loginService), // <- Agenda integrada
+      AgendaWidget(loginService: _loginService), 
       NotificacaoPage(),
     ];
     _pageController = PageController(initialPage: myCurrentIndex);
     _configurarFirebaseMessaging();
+  }
+
+  // NOVO — Buscar nome do Firebase
+  Future<void> _carregarNomeUsuario() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    setState(() {
+      nomeUsuario = user?.displayName ?? "Usuário";
+    });
   }
 
   Future<void> _configurarFirebaseMessaging() async {
@@ -149,11 +165,21 @@ class _HomePageState extends State<HomePage> {
                     color:
                         isDarkMode ? Colors.grey[800] : const Color(0xFF490A1D),
                   ),
-                  child: const Text(
-                    'Menu',
-                    style: TextStyle(color: Colors.white, fontSize: 45),
+
+                  // AQUI COLOQUEI A MENSAGEM "OLÁ, {USUÁRIO}"
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      nomeUsuario != null ? "Olá, $nomeUsuario" : "Olá...",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 38,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
+
                 ListTile(
                   leading: Icon(Icons.person),
                   title: Text("Perfil", style: TextStyle(fontSize: width * 0.045)),
@@ -163,6 +189,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+
                 ListTile(
                   leading: Icon(Icons.lock),
                   title: Text("Resetar Senha", style: TextStyle(fontSize: width * 0.045)),
@@ -172,6 +199,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+
                 ListTile(
                   leading: Icon(Icons.support_agent_rounded),
                   title: Text("Suporte", style: TextStyle(fontSize: width * 0.045)),
@@ -181,6 +209,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+
                 ListTile(
                   leading: Icon(Icons.close_sharp),
                   title: Text("Casos Vencidos", style: TextStyle(fontSize: width * 0.045)),
@@ -190,12 +219,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+
                 SwitchListTile(
                   secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
                   title: Text("Modo Noturno", style: TextStyle(fontSize: width * 0.045)),
                   value: isDarkMode,
                   onChanged: (value) => setState(() => isDarkMode = value),
                 ),
+
                 ListTile(
                   leading: Icon(Icons.logout),
                   title: Text("Deslogar", style: TextStyle(fontSize: width * 0.045)),
@@ -212,6 +243,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+
           body: SafeArea(
             child: Row(
               children: [
@@ -272,6 +304,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+
           bottomNavigationBar: width < 800
               ? Container(
                   margin: EdgeInsets.symmetric(

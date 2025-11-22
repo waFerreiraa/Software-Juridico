@@ -18,30 +18,51 @@ class _ResetPassState extends State<ResetPass> {
   final _auten = AutenticacaoServicos();
 
   InputDecoration meuInputDecoration(String label, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InputDecoration(
       contentPadding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 10.0),
-      prefixIcon: Icon(icon),
+
+      // Ícone branco no modo escuro e preto no claro
+      prefixIcon: Icon(
+        icon,
+        color: isDark ? Colors.white : Colors.black,
+      ),
+
       filled: true,
-      fillColor: const Color(0xffE0D3CA),
+      fillColor: isDark ? const Color(0xFF2D2D2D) : const Color(0xffE0D3CA),
+
       labelText: label,
-      labelStyle: const TextStyle(
+      labelStyle: TextStyle(
         fontSize: 20,
-        color: Color.fromARGB(255, 132, 114, 102),
+        color: isDark
+            ? Colors.white70
+            : const Color.fromARGB(255, 132, 114, 102),
         fontWeight: FontWeight.bold,
       ),
+
       floatingLabelStyle: const TextStyle(
         fontSize: 25,
         color: Color(0xFF490A1D),
         fontWeight: FontWeight.w700,
       ),
+
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color.fromARGB(255, 181, 164, 150), width: 2),
+        borderSide: BorderSide(
+          color: isDark
+              ? Colors.white70
+              : const Color.fromARGB(255, 181, 164, 150),
+          width: 2,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xffE0D3CA), width: 2),
+        borderSide: BorderSide(
+          color: isDark ? Colors.white24 : const Color(0xffE0D3CA),
+          width: 2,
+        ),
       ),
     );
   }
@@ -57,8 +78,8 @@ class _ResetPassState extends State<ResetPass> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFF490A1D), // cor do topo
-        iconTheme: const IconThemeData(color: Colors.white), // botão voltar branco
+        backgroundColor: const Color(0xFF490A1D),
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
       body: Center(

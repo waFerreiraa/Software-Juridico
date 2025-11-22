@@ -525,7 +525,9 @@ class _CadProState extends State<CadPro> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).brightness == Brightness.dark
+        ? Colors.black
+        : Colors.white,
         boxShadow: [
           BoxShadow(
             color: dark ? Colors.transparent : Colors.black.withOpacity(0.1),
@@ -702,11 +704,20 @@ class _CadProState extends State<CadPro> {
 
     return Scaffold(
       // Removido o backgroundColor fixo, ele será definido pelo tema.
-      appBar: AppBar(
-        title: const Text("Cadastro de Processo"),
-        centerTitle: true,
-        
-      ),
+        appBar: AppBar(
+          title: const Text(
+            "Cadastro de Processo",
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: const Color(0xFF490A1D),
+
+    
+          iconTheme: const IconThemeData(
+          color: Colors.white, // cor da seta
+          ),
+        ),
+
       body: Column(
         children: [
           
@@ -726,7 +737,7 @@ class _CadProState extends State<CadPro> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             decoration: BoxDecoration(
-              color: dark ? Colors.grey[850] : Colors.white,
+              color: dark ? const Color.fromARGB(255, 0, 0, 0) : Colors.white, //Botões fixos na parte inferior
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'editarPerfil.dart';
 
 class PerfilPage extends StatelessWidget {
   const PerfilPage({super.key});
@@ -7,46 +8,67 @@ class PerfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+
       appBar: AppBar(
         title: const Text(
           'Meu Perfil',
           style: TextStyle(
-            color: Colors.white, // título branco
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFF490A1D), // fundo personalizado
-        iconTheme: const IconThemeData(color: Colors.white), // botão voltar branco
+        backgroundColor: const Color(0xFF490A1D),
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
+
       body: user == null
-          ? const Center(child: Text("Usuário não logado"))
+          ? Center(
+              child: Text(
+                "Usuário não logado",
+                style: theme.textTheme.bodyLarge,
+              ),
+            )
           : Column(
               children: [
                 const SizedBox(height: 30),
+
+                // FOTO
                 CircleAvatar(
                   radius: 60,
                   backgroundImage: user.photoURL != null
                       ? NetworkImage(user.photoURL!)
-                      : const AssetImage('assets/profile.png') as ImageProvider,
+                      : const AssetImage('assets/profile.png')
+                          as ImageProvider,
                 ),
+
                 const SizedBox(height: 20),
+
+                // NOME
                 Text(
                   user.displayName ?? "Nome não disponível",
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                const SizedBox(height: 8),
+
+                const SizedBox(height: 6),
+
+                // EMAIL
                 Text(
                   user.email ?? "Email não disponível",
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: Colors.grey[800],
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+
                 const SizedBox(height: 30),
+
+                // Botão de EDITAR PERFIL
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Card(
@@ -54,29 +76,27 @@ class PerfilPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 4,
+                    color: theme.cardColor,
                     child: ListTile(
                       leading: const Icon(Icons.edit, color: Color(0xff5E293B)),
-                      title: const Text('Editar Perfil'),
-                      trailing: const Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                        'Editar Perfil',
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Color(0xFF490A1D), 
+                      ),
                       onTap: () {
-                        // Navegar para edição
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                    child: ListTile(
-                      leading: const Icon(Icons.settings, color: Color(0xff5E293B)),
-                      title: const Text('Configurações'),
-                      trailing: const Icon(Icons.arrow_forward_ios),
-                      onTap: () {
-                        // Navegar para configurações
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) => Theme(
+                              data: theme,
+                              child: const EditarPerfil(),
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
