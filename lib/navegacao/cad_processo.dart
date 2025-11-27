@@ -229,6 +229,7 @@ class _CadProState extends State<CadPro> {
       mostrarSnackBar(
         context: context,
         texto: "Erro ao salvar processo, Verifique os campos.",
+        backgroundColor: Colors.red,
       );
     }
   }

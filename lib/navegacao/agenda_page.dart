@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jurisolutions/models/calendar_service.dart';
 import 'package:jurisolutions/models/google_login_service.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:googleapis/calendar/v3.dart' as cal;
 
@@ -72,11 +73,10 @@ class _AgendaWidgetState extends State<AgendaWidget> {
 
   void _handleError(String message) {
     print(message);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+    mostrarSnackBar(
+      context: context,
+      texto: message,
+      backgroundColor: Colors.red,
     );
     _updateState(AgendaState.error, message: message);
   }
@@ -537,35 +537,21 @@ class _LoginView extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () async {
               try {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Row(
-                      children: [
-                        CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                        SizedBox(width: 16),
-                        Text('Fazendo login...'),
-                      ],
-                    ),
-                    duration: Duration(seconds: 10),
-                    backgroundColor: Color(0xFF490A1D),
-                  ),
+                mostrarSnackBar(
+                  context: context,
+                  texto: 'Fazendo login...',
+                  backgroundColor: const Color(0xFF490A1D),
                 );
 
                 await loginService.signIn();
 
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
                 onLogin();
               } catch (e) {
                 print('Erro no login: $e');
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Erro ao fazer login: $e'),
-                    backgroundColor: Colors.red,
-                  ),
+                mostrarSnackBar(
+                  context: context,
+                  texto: 'Erro ao fazer login: $e',
+                  backgroundColor: Colors.red,
                 );
               }
             },

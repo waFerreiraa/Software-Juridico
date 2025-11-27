@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:intl/intl.dart';
 
@@ -101,8 +102,10 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
 
       if (!processoDoc.exists) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Processo não encontrado.')),
+          mostrarSnackBar(
+            context: context,
+            texto: 'Processo não encontrado.',
+            backgroundColor: Colors.red,
           );
           Navigator.pop(context);
         }
@@ -113,8 +116,10 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
 
       if (processoData['usuarioId'] != usuarioId) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Você não tem permissão para editar este processo.')),
+          mostrarSnackBar(
+            context: context,
+            texto: 'Você não tem permissão para editar este processo.',
+            backgroundColor: Colors.red,
           );
           Navigator.pop(context);
         }
@@ -149,7 +154,11 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar dados: $e')));
+        mostrarSnackBar(
+          context: context,
+          texto: 'Erro ao carregar dados: $e',
+          backgroundColor: Colors.red,
+        );
         Navigator.pop(context);
       }
     }
@@ -188,14 +197,20 @@ class _EditarProcessoScreenState extends State<EditarProcessoScreen> {
       await FirebaseFirestore.instance.collection('processos').doc(widget.processoId).update(dados);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Processo atualizado com sucesso!')),
+        mostrarSnackBar(
+          context: context,
+          texto: 'Processo atualizado com sucesso!',
+          backgroundColor: Colors.green,
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar processo: $e')));
+        mostrarSnackBar(
+          context: context,
+          texto: 'Erro ao salvar processo: $e',
+          backgroundColor: Colors.red,
+        );
       }
     }
   }

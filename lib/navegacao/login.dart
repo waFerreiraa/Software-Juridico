@@ -223,7 +223,11 @@ class _LoginPageState extends State<LoginPage> {
       if (queroEntrar) {
         final erro = await _Auten.logarUsuarios(email: email, senha: senha);
         if (erro != null) {
-          mostrarSnackBar(context: context, texto: erro);
+          mostrarSnackBar(
+            context: context,
+            texto: erro,
+            backgroundColor: Colors.red,
+          );
         } else {
           Navigator.pushReplacement(
             context,
@@ -233,8 +237,10 @@ class _LoginPageState extends State<LoginPage> {
       }
       setState(() => _carregando = false);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Preencha todos os campos corretamente.")),
+      mostrarSnackBar(
+        context: context,
+        texto: "Preencha todos os campos corretamente.",
+        backgroundColor: Colors.red,
       );
     }
   }

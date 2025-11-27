@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/navegacao/Vizualizar.dart'; 
 import 'package:jurisolutions/navegacao/editarinfo.dart';
 
@@ -22,12 +23,16 @@ class _CasosAtivosState extends State<CasosAtivos> {
           .collection('processos')
           .doc(processoId)
           .delete();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Processo excluído com sucesso')),
+      mostrarSnackBar(
+        context: context,
+        texto: 'Processo excluído com sucesso',
+        backgroundColor: Colors.green,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao excluir processo: $e')),
+      mostrarSnackBar(
+        context: context,
+        texto: 'Erro ao excluir processo: $e',
+        backgroundColor: Colors.red,
       );
     }
   }
@@ -237,7 +242,7 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                                 onPressed: () =>
                                                     Navigator.of(context)
                                                         .pop(true),
-                                                child: const Text('Excluir'),//texto para teste
+                                                child: const Text('Excluir'),
                                               ),
                                             ],
                                           ),

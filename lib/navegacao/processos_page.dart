@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:jurisolutions/navegacao/cad_processo.dart';
 import 'package:jurisolutions/navegacao/casosAtivos.dart';
 
@@ -107,7 +108,6 @@ class _ProcessosPageState extends State<ProcessosPage> {
                             children: [
                               ElevatedButton(
                                 onPressed: () {
-                                  // ALTERAÇÃO FEITA AQUI
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -140,7 +140,6 @@ class _ProcessosPageState extends State<ProcessosPage> {
                               const SizedBox(height: 15),
                               ElevatedButton(
                                 onPressed: () {
-                                  
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
