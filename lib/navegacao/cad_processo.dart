@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import 'package:jurisolutions/models/meu_snakbar.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -121,13 +122,16 @@ class _CadProState extends State<CadPro> {
   InputDecoration meuInputDecoration(String label) {
     bool dark = Theme.of(context).brightness == Brightness.dark;
     return InputDecoration(
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 14.0, horizontal: 12.0),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 14.0,
+        horizontal: 12.0,
+      ),
       filled: true,
       fillColor: dark ? Colors.grey[800] : const Color(0xffE0D3CA),
       labelText: label,
       labelStyle: TextStyle(
-        color: dark ? Colors.grey[300] : const Color.fromARGB(255, 132, 114, 102),
+        color:
+            dark ? Colors.grey[300] : const Color.fromARGB(255, 132, 114, 102),
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
@@ -135,7 +139,10 @@ class _CadProState extends State<CadPro> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
-          color: dark ? Colors.grey[500]! : const Color.fromARGB(255, 181, 164, 150),
+          color:
+              dark
+                  ? Colors.grey[500]!
+                  : const Color.fromARGB(255, 181, 164, 150),
           width: 2,
         ),
       ),
@@ -186,10 +193,10 @@ class _CadProState extends State<CadPro> {
         'dataTimestamp': Timestamp.fromDate(dataConvertida),
         'valor':
             double.tryParse(
-                  valorCtrl.text
-                      .replaceAll(RegExp(r'[^0-9,]'), '')
-                      .replaceAll(',', '.'),
-                ) ??
+              valorCtrl.text
+                  .replaceAll(RegExp(r'[^0-9,]'), '')
+                  .replaceAll(',', '.'),
+            ) ??
             0.0,
         'numero_vara': numeroVaraCtrl.text,
         'vara': _selectedVara,
@@ -210,17 +217,19 @@ class _CadProState extends State<CadPro> {
       await FirebaseFirestore.instance.collection('processos').add(dados);
 
       // Feedback para o usuário
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Processo salvo com sucesso!')),
+      mostrarSnackBar(
+        context: context,
+        texto: "Processo salvo com sucesso",
+        backgroundColor: Colors.green,
       );
-
       // Limpa os campos do formulário
       _limparCampos();
     } catch (e) {
       print('Erro ao salvar processo: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao salvar processo: $e')));
+      mostrarSnackBar(
+        context: context,
+        texto: "Erro ao salvar processo, Verifique os campos.",
+      );
     }
   }
 
@@ -258,13 +267,14 @@ class _CadProState extends State<CadPro> {
     bool dark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () => _showDropdownModal(
-        context,
-        label,
-        options,
-        selectedValue,
-        onChanged,
-      ),
+      onTap:
+          () => _showDropdownModal(
+            context,
+            label,
+            options,
+            selectedValue,
+            onChanged,
+          ),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
@@ -281,17 +291,26 @@ class _CadProState extends State<CadPro> {
               child: Text(
                 selectedValue ?? label,
                 style: TextStyle(
-                  color: selectedValue != null
-                      ? (dark ? Colors.white70 : Colors.black87)
-                      : (dark ? Colors.grey[400] : const Color.fromARGB(255, 132, 114, 102)),
+                  color:
+                      selectedValue != null
+                          ? (dark ? Colors.white70 : Colors.black87)
+                          : (dark
+                              ? Colors.grey[400]
+                              : const Color.fromARGB(255, 132, 114, 102)),
                   fontSize: 16,
-                  fontWeight: selectedValue != null ? FontWeight.normal : FontWeight.bold,
+                  fontWeight:
+                      selectedValue != null
+                          ? FontWeight.normal
+                          : FontWeight.bold,
                 ),
               ),
             ),
             Icon(
               Icons.keyboard_arrow_down,
-              color: dark ? Colors.white70 : const Color.fromARGB(255, 132, 114, 102),
+              color:
+                  dark
+                      ? Colors.white70
+                      : const Color.fromARGB(255, 132, 114, 102),
               size: 24,
             ),
           ],
@@ -366,10 +385,11 @@ class _CadProState extends State<CadPro> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: options.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    color: dark ? Colors.grey[700] : Colors.grey.shade300,
-                  ),
+                  separatorBuilder:
+                      (context, index) => Divider(
+                        height: 1,
+                        color: dark ? Colors.grey[700] : Colors.grey.shade300,
+                      ),
                   itemBuilder: (context, index) {
                     final option = options[index];
                     final isSelected = option == currentValue;
@@ -385,18 +405,25 @@ class _CadProState extends State<CadPro> {
                           fontSize: 16,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected
-                              ? (dark ? const Color(0xFF490A1D) : const Color(0xFF490A1D))
-                              : (dark ? Colors.white70 : Colors.black87),
+                          color:
+                              isSelected
+                                  ? (dark
+                                      ? const Color(0xFF490A1D)
+                                      : const Color(0xFF490A1D))
+                                  : (dark ? Colors.white70 : Colors.black87),
                         ),
                       ),
-                      trailing: isSelected
-                          ? Icon(
-                              Icons.check_circle,
-                              color: dark ? const Color(0xFF490A1D) : const Color(0xFF490A1D),
-                              size: 20,
-                            )
-                          : null,
+                      trailing:
+                          isSelected
+                              ? Icon(
+                                Icons.check_circle,
+                                color:
+                                    dark
+                                        ? const Color(0xFF490A1D)
+                                        : const Color(0xFF490A1D),
+                                size: 20,
+                              )
+                              : null,
                       onTap: () {
                         onChanged(option);
                         Navigator.pop(context);
@@ -527,9 +554,10 @@ class _CadProState extends State<CadPro> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-        ? Colors.black
-        : Colors.white,
+        color:
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.black
+                : Colors.white,
         boxShadow: [
           BoxShadow(
             color: dark ? Colors.transparent : Colors.black.withOpacity(0.1),
@@ -538,7 +566,7 @@ class _CadProState extends State<CadPro> {
           ),
         ],
       ),
-      
+
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -559,7 +587,7 @@ class _CadProState extends State<CadPro> {
             children: List.generate(3, (index) {
               bool isActive = index == _currentStep;
               bool isCompleted = index < _currentStep;
-            
+
               return Row(
                 children: [
                   Container(
@@ -567,46 +595,64 @@ class _CadProState extends State<CadPro> {
                     height: 32,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isActive
-                          ? const Color(0xFF490A1D) // Cor para o passo ativo (vinho)
-                          : isCompleted
-                              ? const Color.fromARGB(255, 143, 23, 59) // Cor para o passo concluído (vinho mais escuro)
-                              : (dark ? Colors.grey[800] : const Color(0xffE0D3CA)), // Cor padrão
+                      color:
+                          isActive
+                              ? const Color(
+                                0xFF490A1D,
+                              ) // Cor para o passo ativo (vinho)
+                              : isCompleted
+                              ? const Color.fromARGB(
+                                255,
+                                143,
+                                23,
+                                59,
+                              ) // Cor para o passo concluído (vinho mais escuro)
+                              : (dark
+                                  ? Colors.grey[800]
+                                  : const Color(0xffE0D3CA)), // Cor padrão
                       border: Border.all(
-                        color: isActive || isCompleted
-                            ? const Color(0xFF490A1D) // Cor da borda
-                            : (dark ? Colors.grey[700]! : Colors.grey.shade400),
+                        color:
+                            isActive || isCompleted
+                                ? const Color(0xFF490A1D) // Cor da borda
+                                : (dark
+                                    ? Colors.grey[700]!
+                                    : Colors.grey.shade400),
                         width: 2,
                       ),
-                      boxShadow: isActive
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF490A1D).withOpacity(0.3),
-                                blurRadius: 6,
-                                spreadRadius: 1,
-                              ),
-                            ]
-                          : null,
+                      boxShadow:
+                          isActive
+                              ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF490A1D,
+                                  ).withOpacity(0.3),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                              : null,
                     ),
                     child: Center(
-                      child: isCompleted
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 16,
-                            )
-                          : Text(
-                              "${index + 1}",
-                              style: TextStyle(
-                                color: isActive
-                                    ? Colors.white
-                                    : isCompleted
-                                        ? Colors.white
-                                        : Colors.grey.shade600,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                      child:
+                          isCompleted
+                              ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                              : Text(
+                                "${index + 1}",
+                                style: TextStyle(
+                                  color:
+                                      isActive
+                                          ? Colors.white
+                                          : isCompleted
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
                     ),
                   ),
                   if (index != 2)
@@ -616,9 +662,14 @@ class _CadProState extends State<CadPro> {
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(2),
-                        color: index < _currentStep
-                            ? const Color(0xFF490A1D) // Cor da linha de progresso
-                            : (dark ? Colors.grey[700] : const Color(0xffE0D3CA)),
+                        color:
+                            index < _currentStep
+                                ? const Color(
+                                  0xFF490A1D,
+                                ) // Cor da linha de progresso
+                                : (dark
+                                    ? Colors.grey[700]
+                                    : const Color(0xffE0D3CA)),
                       ),
                     ),
                 ],
@@ -683,15 +734,24 @@ class _CadProState extends State<CadPro> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: dark ? Colors.grey[800] : const Color(0xffE0D3CA).withOpacity(0.3),
+                color:
+                    dark
+                        ? Colors.grey[800]
+                        : const Color(0xffE0D3CA).withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: dark ? Colors.grey[700]! : const Color(0xFF490A1D).withOpacity(0.2),
+                  color:
+                      dark
+                          ? Colors.grey[700]!
+                          : const Color(0xFF490A1D).withOpacity(0.2),
                 ),
               ),
               child: Text(
                 "Revise as informações inseridas e clique em 'Salvar' para finalizar o cadastro do processo.",
-                style: TextStyle(fontSize: 16, color: dark ? Colors.white70 : Colors.black87),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: dark ? Colors.white70 : Colors.black87,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -706,26 +766,23 @@ class _CadProState extends State<CadPro> {
 
     return Scaffold(
       // Removido o backgroundColor fixo, ele será definido pelo tema.
-        appBar: AppBar(
-          title: const Text(
-            "Cadastro de Processo",
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          backgroundColor: const Color(0xFF490A1D),
-
-    
-          iconTheme: const IconThemeData(
-          color: Colors.white, // cor da seta
-          ),
+      appBar: AppBar(
+        title: const Text(
+          "Cadastro de Processo",
+          style: TextStyle(color: Colors.white),
         ),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF490A1D),
+
+        iconTheme: const IconThemeData(
+          color: Colors.white, // cor da seta
+        ),
+      ),
 
       body: Column(
         children: [
-          
           _buildFixedStepIndicator(),
 
-          
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -739,7 +796,10 @@ class _CadProState extends State<CadPro> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             decoration: BoxDecoration(
-              color: dark ? const Color.fromARGB(255, 0, 0, 0) : Colors.white, //Botões fixos na parte inferior
+              color:
+                  dark
+                      ? const Color.fromARGB(255, 0, 0, 0)
+                      : Colors.white, //Botões fixos na parte inferior
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -761,10 +821,16 @@ class _CadProState extends State<CadPro> {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(0, 55),
                         elevation: 4,
-                        shadowColor: dark ? Colors.transparent : const Color.fromARGB(255, 64, 27, 39),
+                        shadowColor:
+                            dark
+                                ? Colors.transparent
+                                : const Color.fromARGB(255, 64, 27, 39),
                         backgroundColor: dark ? Colors.grey[700] : Colors.white,
                         side: BorderSide(
-                          color: dark ? Colors.grey[500]! : const Color(0xFF490A1D),
+                          color:
+                              dark
+                                  ? Colors.grey[500]!
+                                  : const Color(0xFF490A1D),
                           width: 2,
                         ),
                         shape: RoundedRectangleBorder(
@@ -796,8 +862,14 @@ class _CadProState extends State<CadPro> {
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(0, 55),
                       elevation: 4,
-                      shadowColor: dark ? Colors.transparent : const Color.fromARGB(255, 64, 27, 39),
-                      backgroundColor: dark ? const Color(0xFF490A1D) : const Color(0xFF490A1D),
+                      shadowColor:
+                          dark
+                              ? Colors.transparent
+                              : const Color.fromARGB(255, 64, 27, 39),
+                      backgroundColor:
+                          dark
+                              ? const Color(0xFF490A1D)
+                              : const Color(0xFF490A1D),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(9),
                       ),
@@ -815,7 +887,7 @@ class _CadProState extends State<CadPro> {
               ],
             ),
           ),
-        ],//texto para teste
+        ], //texto para teste
       ),
     );
   }
