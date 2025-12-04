@@ -37,6 +37,23 @@ class _CasosAtivosState extends State<CasosAtivos> {
     }
   }
 
+  // Função para pegar apenas o último histórico
+  String _obterUltimoHistorico(String? historicoCompleto) {
+    if (historicoCompleto == null || historicoCompleto.trim().isEmpty) {
+      return 'Sem histórico';
+    }
+
+    // Divide o histórico por quebras de linha duplas
+    final entradas = historicoCompleto.split('\n\n');
+    
+    // Retorna a última entrada (que é a mais recente)
+    if (entradas.isNotEmpty) {
+      return entradas.last.trim();
+    }
+    
+    return 'Sem histórico';
+  }
+
   @override
   Widget build(BuildContext context) {
     // Pega o tema atual
@@ -112,6 +129,9 @@ class _CasosAtivosState extends State<CasosAtivos> {
                     }
                   }
 
+                  // Pega apenas o último histórico
+                  final ultimoHistorico = _obterUltimoHistorico(processo['historico']);
+
                   return Card(
                     margin: const EdgeInsets.symmetric(
                       vertical: 10,
@@ -135,6 +155,7 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                   nomeCliente: nomeCliente,
                                   historico: processo['historico'] ??
                                       'Sem histórico disponível',
+                                  processoId: processoId,
                                 ),
                               );
                             },
@@ -161,9 +182,11 @@ class _CasosAtivosState extends State<CasosAtivos> {
                                   fontSize: 16, color: defaultTextColor),
                             ),
                             Text(
-                              'Histórico: ${processo['historico'] ?? "Sem histórico"}',
+                              'Último histórico: $ultimoHistorico',
                               style: TextStyle(
                                   fontSize: 16, color: defaultTextColor),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 8),
                             Row(

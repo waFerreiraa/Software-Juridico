@@ -26,7 +26,6 @@ class _CadProState extends State<CadPro> {
   final andamentoCtrl = TextEditingController();
   final faseCtrl = TextEditingController();
   final assuntoCtrl = TextEditingController();
-  final historicoCtrl = TextEditingController();
 
   final nomeParteCtrl = TextEditingController();
   final cpfCnpjCtrl = TextEditingController();
@@ -205,9 +204,9 @@ class _CadProState extends State<CadPro> {
         'andamento': _selectedAndamento,
         'fase_processual': _selectedFase,
         'assunto': assuntoCtrl.text,
-        'historico': historicoCtrl.text,
         'partes': partes,
         'status': 'ativo',
+        'historico': '',
         'usuarioId': FirebaseAuth.instance.currentUser!.uid,
         'token': fcmToken,
         'notificado': false,
@@ -242,7 +241,6 @@ class _CadProState extends State<CadPro> {
     andamentoCtrl.clear();
     faseCtrl.clear();
     assuntoCtrl.clear();
-    historicoCtrl.clear();
     nomeParteCtrl.clear();
     cpfCnpjCtrl.clear();
     enderecoCtrl.clear();
@@ -505,11 +503,6 @@ class _CadProState extends State<CadPro> {
         TextFormField(
           controller: assuntoCtrl,
           decoration: meuInputDecoration("Assunto*"),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: historicoCtrl,
-          decoration: meuInputDecoration("Histórico*"),
         ),
       ],
     );
