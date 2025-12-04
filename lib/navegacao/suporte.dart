@@ -19,7 +19,7 @@ class _SuportePageState extends State<SuportePage> {
     },
     {
       "pergunta": "Para onde vão os processos que já se encerraram?",
-      "resposta": "Vá até o menu e clique no botão Casos Vencidos, lá estarão todos os processos que já finalizaram."
+      "resposta": "Vá até o menu e clique no botão 'Casos Vencidos', lá estarão todos os processos que já finalizaram."
     },
     {
       "pergunta": "Não estou recebendo notificações, o que fazer?",
@@ -27,7 +27,7 @@ class _SuportePageState extends State<SuportePage> {
     },
     {
       "pergunta": "Como alterar minha senha?",
-      "resposta": "No menu lateral, clique em “Resetar Senha” e siga as instruções."
+      "resposta": "No menu lateral, clique em 'Resetar Senha' e siga as instruções."
     },
     {
       "pergunta": "O que fazer se o app travar ou apresentar erro?",
