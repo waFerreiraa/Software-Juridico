@@ -26,6 +26,89 @@ class _CadastroPageState extends State<CadastroPage> {
   final _confirmarSenhaController = TextEditingController();
 
   final _auten = AutenticacaoServicos();
+  
+  // Controla se as dicas de senha estão visíveis
+  bool _mostrarDicasSenha = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Adiciona listener para atualizar em tempo real
+    _senhaController.addListener(() {
+      if (_mostrarDicasSenha) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _senhaController.dispose();
+    _nomeController.dispose();
+    _emailController.dispose();
+    _confirmarSenhaController.dispose();
+    super.dispose();
+  }
+
+  // Função para validar senha forte
+  String? _validarSenhaForte(String? value) {
+    if (value == null || value.isEmpty) {
+      return "A senha não pode ser vazia";
+    }
+    
+    if (value.length < 8) {
+      return "A senha deve ter pelo menos 8 caracteres";
+    }
+    
+    // Verifica se tem letra maiúscula
+    if (!value.contains(RegExp(r'[A-Z]'))) {
+      return "A senha deve conter pelo menos uma letra maiúscula";
+    }
+    
+    // Verifica se tem letra minúscula
+    if (!value.contains(RegExp(r'[a-z]'))) {
+      return "A senha deve conter pelo menos uma letra minúscula";
+    }
+    
+    // Verifica se tem número
+    if (!value.contains(RegExp(r'[0-9]'))) {
+      return "A senha deve conter pelo menos um número";
+    }
+    
+    // Verifica se tem caractere especial
+    if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      return "A senha deve conter pelo menos um caractere especial (!@#\$%^&*...)";
+    }
+    
+    return null;
+  }
+
+  // Widget para mostrar cada requisito com check verde ou X vermelho
+  Widget _buildRequisitoItem(String texto, bool cumprido) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            cumprido ? Icons.check_circle : Icons.cancel,
+            color: cumprido ? Colors.green : Colors.red,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              texto,
+              style: TextStyle(
+                fontSize: 13,
+                color: cumprido ? Colors.green[700] : Colors.red[700],
+                fontWeight: cumprido ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   InputDecoration meuInputDecoration(String label, IconData icon) {
     return InputDecoration(
@@ -131,18 +214,78 @@ class _CadastroPageState extends State<CadastroPage> {
           ),
           const SizedBox(height: 25),
 
-          // Senha
-          CampoSenha(
-            controller: _senhaController,
-            hintText: "Senha",
-            validator: (value) {
-              if (value == null || value.isEmpty)
-                return "A senha não pode ser vazia";
-              if (value.length < 6)
-                return "A senha deve ter pelo menos 6 caracteres";
-              return null;
-            },
-            decoration: meuInputDecoration("Senha", Icons.lock),
+          // Senha com validação forte e tooltip flutuante
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Focus(
+                onFocusChange: (hasFocus) {
+                  setState(() {
+                    _mostrarDicasSenha = hasFocus;
+                  });
+                },
+                child: CampoSenha(
+                  controller: _senhaController,
+                  hintText: "Senha",
+                  validator: _validarSenhaForte,
+                  decoration: meuInputDecoration("Senha", Icons.lock),
+                ),
+              ),
+              
+              // Tooltip flutuante acima do campo
+              if (_mostrarDicasSenha)
+                Positioned(
+                  bottom: 85,
+                  left: 0,
+                  right: 0,
+                  child: Material(
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(12),
+                    shadowColor: Colors.black.withOpacity(0.3),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFF490A1D),
+                          width: 2,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.lock_outline,
+                                color: Color(0xFF490A1D),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                "Requisitos da senha:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Color(0xFF490A1D),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRequisitoItem("Mínimo 8 caracteres", _senhaController.text.length >= 8),
+                          _buildRequisitoItem("Uma letra maiúscula (A-Z)", _senhaController.text.contains(RegExp(r'[A-Z]'))),
+                          _buildRequisitoItem("Uma letra minúscula (a-z)", _senhaController.text.contains(RegExp(r'[a-z]'))),
+                          _buildRequisitoItem("Um número (0-9)", _senhaController.text.contains(RegExp(r'[0-9]'))),
+                          _buildRequisitoItem("Um caractere especial (!@#\$...)", _senhaController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 25),
 
@@ -153,8 +296,6 @@ class _CadastroPageState extends State<CadastroPage> {
             validator: (value) {
               if (value == null || value.isEmpty)
                 return "A senha não pode ser vazia";
-              if (value.length < 6)
-                return "A senha deve ter pelo menos 6 caracteres";
               if (value != _senhaController.text)
                 return "As senhas não coincidem";
               return null;
