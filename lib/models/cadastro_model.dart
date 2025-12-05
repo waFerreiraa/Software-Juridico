@@ -54,12 +54,12 @@ class AutenticacaoServicos {
           return 'E-mail não encontrado. Verifique e tente novamente.';
         case 'wrong-password':
           return 'Senha incorreta. Tente novamente.';
-        case 'invalid-email':
+        case 'senha-invalida':
           return 'Formato de e-mail inválido.';
         case 'user-disabled':
           return 'Esta conta foi desativada.';
         default:
-          return 'Erro ao fazer login: ${e.message}';
+          return 'Erro ao fazer login: Verifique se seus dados estão corretos.';
       }
     } catch (e) {
       return 'Erro inesperado: $e';

@@ -18,7 +18,6 @@ class NotificacaoPage extends StatelessWidget {
     final uid = user.uid;
 
     return Scaffold(
-      appBar: AppBar(),
       body: StreamBuilder<QuerySnapshot>(
         stream:
             FirebaseFirestore.instance
