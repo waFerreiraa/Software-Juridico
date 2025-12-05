@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:jurisolutions/navegacao/Vizualizar.dart';
 
 class NotificacaoPage extends StatelessWidget {
   const NotificacaoPage({super.key});
@@ -22,7 +23,7 @@ class NotificacaoPage extends StatelessWidget {
         stream:
             FirebaseFirestore.instance
                 .collection('processos')
-                .where('usuarioId', isEqualTo: uid) // << FILTRO DO USUÁRIO
+                .where('usuarioId', isEqualTo: uid)
                 .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -36,7 +37,7 @@ class NotificacaoPage extends StatelessWidget {
           final agora = DateTime.now();
           final docs = snapshot.data!.docs;
 
-          // Filtra os processos que vencem em até 20 dias
+          // Filtra processos que vencem em até 20 dias
           final proximosVencimentos =
               docs.where((doc) {
                 final data = doc.data() as Map<String, dynamic>;
@@ -64,14 +65,28 @@ class NotificacaoPage extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             itemCount: proximosVencimentos.length,
             itemBuilder: (context, index) {
-              final data =
-                  proximosVencimentos[index].data() as Map<String, dynamic>;
+              final doc = proximosVencimentos[index];
+              final data = doc.data() as Map<String, dynamic>;
+
               final numero = data['numero']?.toString() ?? "Sem número";
               final dataVenc = (data['dataTimestamp'] as Timestamp).toDate();
               final diasRestantes = dataVenc.difference(agora).inDays;
 
+              // PEGAR NOME DO CLIENTE (igual CasosAtivos)
+              String nomeCliente = 'Não informado';
+              if (data['partes'] != null &&
+                  data['partes'] is List &&
+                  data['partes'].isNotEmpty) {
+                final partes = List.from(data['partes']);
+                final primeiraParte = partes[0];
+                if (primeiraParte is Map<String, dynamic> &&
+                    primeiraParte.containsKey('nome')) {
+                  nomeCliente = primeiraParte['nome'];
+                }
+              }
+
               return Card(
-                margin: const EdgeInsets.symmetric(vertical: 1),
+                margin: const EdgeInsets.symmetric(vertical: 4),
                 child: ListTile(
                   leading: const Icon(
                     Icons.warning_amber_rounded,
@@ -84,6 +99,24 @@ class NotificacaoPage extends StatelessWidget {
                   subtitle: Text(
                     'Vence em $diasRestantes dias (${dataVenc.day}/${dataVenc.month}/${dataVenc.year})',
                   ),
+
+                  // 👉 MESMO COMPORTAMENTO DO CasosAtivos
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return DetalhesProcessoScreen(
+                            numero: numero,
+                            nomeCliente: nomeCliente,
+                            historico:
+                                data['historico'] ?? 'Sem histórico disponível',
+                            processoId: doc.id,
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               );
             },
